@@ -1,0 +1,17 @@
+ <svg width="150" height="60" viewBox="0 10 400 60" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="400" height="100" fill="#1e1e2e" rx="10" />
+                                    <g transform="translate(20,20)">
+                                        <rect x="10" y="10" width="40" height="60" fill="#f5deb3" stroke="#8b5a2b"
+                                            stroke-width="3" rx="5" />
+                                        <circle cx="10" cy="20" r="7" fill="#8b5a2b" />
+                                        <circle cx="50" cy="20" r="7" fill="#8b5a2b" />
+                                        <circle cx="10" cy="70" r="7" fill="#8b5a2b" />
+                                        <circle cx="50" cy="70" r="7" fill="#8b5a2b" />
+                                        <line x1="10" y1="20" x2="50" y2="20" stroke="#8b5a2b" stroke-width="3" />
+                                        <line x1="10" y1="70" x2="50" y2="70" stroke="#8b5a2b" stroke-width="3" />
+                                    </g>
+                                    <text x="80" y="60" font-family="'Georgia', serif" font-size="50" fill="#f5deb3"
+                                        font-weight="bold">
+                                        Scroll Saga
+                                    </text>
+                                </svg>

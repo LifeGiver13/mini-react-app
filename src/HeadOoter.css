@@ -1,0 +1,52 @@
+#navbar {
+    background-color: #343a40;
+    padding: 20px;
+    text-align: center;
+    margin: 0;
+}
+
+#navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    display: inline-block;
+}
+
+.list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#navbar li {
+    display: inline;
+}
+
+#navbar li a:hover {
+    background-color: white;
+    color: black;
+}
+
+#content {
+    padding: 20px;
+    background-color: burlywood;
+    margin: 0;
+}
+
+input {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 14px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+}
