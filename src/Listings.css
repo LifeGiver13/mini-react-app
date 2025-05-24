@@ -1,0 +1,124 @@
+/* Container Setup */
+.container {
+    padding: 1rem;
+    margin: 0 auto;
+    max-width: 1400px;
+    /* Wider max width for desktop */
+    box-sizing: border-box;
+}
+
+/* Responsive Grid List */
+.list {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Listing Card */
+#myDIV {
+    width: 100%;
+    height: auto;
+    background-color: #1e1e2e;
+    padding: 20px;
+    border-radius: 30px;
+    display: block;
+    overflow-y: hidden;
+    box-sizing: border-box;
+}
+
+/* Card Content Wrapper */
+.flex-cont {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: linear-gradient(90deg, #343a40 60%, #4CAF50 100%);
+    ;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.flex-cont>div {
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+/* Titles and Text */
+#myDIV h3,
+#myDIV h4 {
+    color: #f5deb3;
+    margin: 10px 0;
+}
+
+#myDIV p {
+    color: #f5deb3;
+    font-size: 1rem;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+}
+
+/* Image Styling */
+#myDIV img {
+    border-radius: 15%;
+    border: 2px solid #8b5a2b;
+    width: 90%;
+    height: 250px;
+    object-fit: cover;
+    margin: 1rem 0;
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #myDIV {
+        width: 100%;
+        height: auto;
+    }
+
+    .flex-cont {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .flex-cont>div {
+        text-align: left;
+    }
+
+    #myDIV img {
+        width: 45%;
+        height: 200px;
+        margin: 0 1rem 0 0;
+    }
+}
+
+/* Mobile */
+@media (max-width: 745px) {
+    #myDIV {
+        width: 100%;
+        margin: 10px 0;
+        padding: 15px;
+        border-radius: 20px;
+    }
+
+    .flex-cont {
+        flex-direction: column;
+    }
+
+    #myDIV img {
+        width: 90%;
+        height: 200px;
+        margin: 10px auto;
+        display: block;
+    }
+}

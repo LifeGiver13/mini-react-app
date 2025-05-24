@@ -2,47 +2,37 @@ import { Link } from 'react-router-dom';
 import Footer from './Footer';
 import './HeadOoter.css';
 
-
-
-export default function Header({ props, children }) {
+export default function Header({ children }) {
     return (
         <>
-            <div id='wrapper'>
-                <div id='navbar'>
-                    <nav>
+            <div id="wrapper">
+                <div id="navbar">
+                    <img src="logo.svg" alt="Scroll Saga" className="logo" style={{ width: '190px' }} height={"auto"} />
 
-                        <ul className='list'>
-                            <li>
-                                <img src='logo.svg' alt='Scroll Saga' />
-                            </li>
-                            <li>
-                                <Link to="/">Home</Link>
-                            </li>
-                            <li>
-                                <Link to="/users">Users</Link>
-                            </li>                            
-                            
-                            <li>
-                                <Link to="/listings">Listings</Link>
-                            </li>
+                    <input type="checkbox" id="menu-toggle" />
 
-                            <li>
-                                <Link to='/register'>Register</Link>
-                            </li>
-                            <li>
-                                <Link to='/login'>Login</Link>
-                            </li>
+                    <label htmlFor="menu-toggle" className="hamburger">&#9776;</label>
+
+
+                    <div className="nav-container">
+                        <ul className="nav-links">
+                            <li><Link to="/">Home</Link></li>
+                            <li><Link to="/users">Users</Link></li>
+                            <li><Link to="/listings">Listings</Link></li>
+                            <li><Link to="/register">Register</Link></li>
+                            <li><Link to="/login">Login</Link></li>
                         </ul>
-                    </nav>
+                    </div>
                 </div>
-                <div id='content'>
+
+                <div id="content">
                     {children}
                 </div>
-                <div id='footer'>
+
+                <div id="footer">
                     <Footer />
                 </div>
             </div>
         </>
-    )
+    );
 }
-

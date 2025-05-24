@@ -6,9 +6,11 @@ from datetime import datetime
 import os
 import base64
 
+app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=[
-    "http://localhost:5173", 
-    "https://your-vercel-frontend.vercel.app"  # Replace with your real Vercel frontend domain
+    "http://localhost:5173",
+    # Replace with your real Vercel frontend domain
+    "https://your-vercel-frontend.vercel.app"
 ])
 # Secret key for session
 app.secret_key = os.environ.get("SECRET_KEY", "supersecret")
@@ -42,6 +44,14 @@ class Users(db.Model):
             "user_bio": self.user_bio if self.user_bio else "None"
         }
 
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    user = Users.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify(user.to_dict())
 
 
 # ------------------ Init ------------------

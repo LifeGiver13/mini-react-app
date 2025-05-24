@@ -1,10 +1,19 @@
 import Header from "../Header";
-
 import { useEffect, useState } from "react";
+import "../Listings.css"
+// import { useNavigate } from "react-router-dom";
+
 export default function Listings() {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    // const navigate = setNavigate()
+
+    // function handleRedirect() {
+    //     onclick => useNavigate("https://lifegiver13.pythonanywhere.com/")
+
+    // }
+
     useEffect(() => {
         const fetchListings = async () => {
             try {
@@ -32,11 +41,9 @@ export default function Listings() {
 
     return (
         <>
-            <Header >
-                <h1>Listings</h1>
-                <div className="p-4">
-
-
+            <Header>
+                <h1 className="text-2xl font-bold text-center my-4">Listings</h1>
+                <div className="container">
 
                     {loading ? (
                         <p>Loading...</p>
@@ -44,24 +51,31 @@ export default function Listings() {
                         <p className="text-red-500">{error}</p>
                     ) : listings.length === 0 ? (
                         <p>No listings found.</p>
-                    ) : ( 
-
-                        <ul className="space-y-4">
+                    ) : (
+                        <ul className="list">
+                            <p>Click on the link below to start Reading each of this novels: <button type="redirect" >Go To site</button> </p>
                             {listings.map((listing) => (
-                                <li key={listing.id} className="p-4 bg-white rounded shadow">
-
-
-                                    <img src={listing.cover_image} alt={listing.novel_title} />
-                                    <h2 className="text-xl font-bold">{listing.novel_title}</h2>
-                                    <p className="text-gray-600">Author: {listing.author}</p>
-                                    <p>{listing.description}</p>
-                                    {/* Add other fields as needed */}
+                                <li key={listing.id} id="myDIV">
+                                    <div className="flex-cont">
+                                        <img
+                                            src={`https://lifegiver13.pythonanywhere.com/static/images/${listing.cover_image}`}
+                                            alt={listing.novel_title}
+                                        />
+                                        <div>
+                                            <h3>{listing.novel_title}</h3>
+                                            <h4>Author: {listing.author}</h4>
+                                            <p>{listing.description}</p>
+                                        </div>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
                     )}
                 </div>
             </Header>
+
+
+
         </>
     );
 }

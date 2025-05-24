@@ -12,7 +12,8 @@ export default function UserDetails() {
         if (!id) return;
         const fetchUser = async () => {
             try {
-                const response = await fetch(`https://lifegiver13.pythonanywhere.com/api/users/${id}`, {
+                const response = await fetch(`https://lifegiver13.pythonanywhere.com/api/users/${id}`
+                , {
                     method: "GET",
                     credentials: "include"
                 });
