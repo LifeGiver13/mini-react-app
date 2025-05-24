@@ -26,7 +26,7 @@ export default function Login() {
         }
 
         try {
-            const res = await fetch("https://lifegiver13.pythonanywhere.com/", {
+            const res = await fetch("https://lifegiver13.pythonanywhere.com/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

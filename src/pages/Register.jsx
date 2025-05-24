@@ -49,7 +49,7 @@ export default function Register() {
             if (form.profile_photo && !form.profile_photo.startsWith("data:image/")) {
                 throw new Error("Invalid profile photo format. Please upload a valid image.");
             }
-            const res = await fetch("https://lifegiver13.pythonanywhere.com/api/register", {
+            const res = await fetch("https://lifegiver13.pythonanywhere.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
