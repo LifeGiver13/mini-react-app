@@ -43,6 +43,7 @@ class Users(db.Model):
         }
 
 
+
 # ------------------ Init ------------------
 if __name__ == "__main__":
     with app.app_context():

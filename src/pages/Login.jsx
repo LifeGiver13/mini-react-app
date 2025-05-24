@@ -42,9 +42,10 @@ export default function Login() {
             }
 
             setSuccess('Login successful!');
-            
+            localStorage.setItem("user", JSON.stringify(form.username));
+
             setTimeout(() => {
-                navigate('/listings')
+                navigate('/users')
             }, 1500);
             // TODO: Redirect or set user context
         } catch (err) {

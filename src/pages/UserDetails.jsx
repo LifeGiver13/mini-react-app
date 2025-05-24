@@ -8,6 +8,8 @@ export default function UserDetails() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log("Fetching user with ID:", id);
+        if (!id) return;
         const fetchUser = async () => {
             try {
                 const response = await fetch(`https://lifegiver13.pythonanywhere.com/api/users/${id}`, {

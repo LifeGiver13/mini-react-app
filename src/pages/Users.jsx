@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../Header";
+import { Link, useParams } from "react-router-dom"; 
+
 
 export default function Users() {
     const [users, setUsers] = useState([]);
@@ -17,7 +19,7 @@ export default function Users() {
                 }
 
                 const data = await response.json();
-                setUsers(data); // Save data in state
+                setUsers(data);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
@@ -27,26 +29,30 @@ export default function Users() {
     }, []);
 
     return (
-        <>
-            <Header>
-                <h1>Users</h1>
+        <Header>
+            <h1>Users</h1>
+            <div className="p-4">
+                {users.length === 0 ? (
+                    <p>No users found.</p>
+                ) : (
+                    <ul className="space-y-4">
+                        {users.map((user) => (
+                            <li key={user.user_id} className="p-4 bg-white rounded shadow">
+                                <h2 className="text-xl font-bold">{user.username}</h2>
+                                <p>Email: {user.email_address}</p>
 
-                <div className="p-4">
-                    {users.length === 0 ? (
-                        <p>No users found.</p>
-                    ) : (
-                        <ul className="space-y-4">
-                            {users.map((user) => (
-                                <li key={user.id} className="p-4 bg-white rounded shadow">
-                                    <h2 className="text-xl font-bold">{user.username}</h2>
-                                    <p>Email: {user.email_address}</p>
-                                    {/* Add other fields as needed */}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>            </Header>
-
-        </>
+                                {/* Button to navigate to user details */}
+                                <Link
+                                    to={`/users/${user.user_id}`}
+                                    className="text-blue-500 underline mt-2 inline-block"
+                                >
+                                    View Details
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </Header>
     );
 }

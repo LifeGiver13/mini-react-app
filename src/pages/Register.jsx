@@ -35,35 +35,40 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setSuccess('');
+        setError('');
         setLoading(true);
-
+    
         try {
-
-
+            // ✅ Client-side validation with returns
             if (!form.username || !form.email || !form.password || !form.confirm_password) {
-                throw new Error("All fields are required.");
+                setError("All fields are required.");
+                return;
             }
             if (form.password !== form.confirm_password) {
-                throw new Error("Passwords do not match.");
+                setError("Passwords do not match.");
+                return;
             }
             if (form.profile_photo && !form.profile_photo.startsWith("data:image/")) {
-                throw new Error("Invalid profile photo format. Please upload a valid image.");
+                setError("Invalid profile photo format. Please upload a valid image.");
+                return;
             }
+    
+            // ✅ API call
             const res = await fetch("https://lifegiver13.pythonanywhere.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify(form),
             });
-
+    
             const data = await res.json();
+    
             if (!res.ok) {
+                // ✅ Error from API
                 throw new Error(data.message || "Registration failed");
             }
-
-
+    
             setSuccess(data.message);
             setForm({
                 username: "",
@@ -73,22 +78,31 @@ export default function Register() {
                 bio: "",
                 profile_photo: null,
             });
+    
+            // ✅ Redirect after success
             setTimeout(() => {
-                navigate("/login")
+                navigate("/login");
             }, 1500);
-        // } catch (err) {
-        //     setError(err.message);
+        } catch (err) {
+            // ✅ Catch block restored
+            setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+    
+
+  
 
     return (
         <Header>
             <h1>Register</h1>
+            <p>Fill in the form below to Register.</p>
+
             <form onSubmit={handleSubmit} encType="multipart/form-data" >
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {success && <p style={{ color: 'green' }}>{success}</p>}
+
 
                 <p>
                     <input

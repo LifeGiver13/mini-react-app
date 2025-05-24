@@ -21,9 +21,7 @@ export default function Header({ props, children }) {
                             <li>
                                 <Link to="/users">Users</Link>
                             </li>                            
-                            <li>
-                                <Link to="/user/:id">User Details</Link>
-                            </li>
+                            
                             <li>
                                 <Link to="/listings">Listings</Link>
                             </li>
