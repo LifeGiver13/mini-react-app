@@ -1,4 +1,5 @@
 import Header from "../Header";
+
 import { useEffect, useState } from "react";
 export default function Listings() {
     const [listings, setListings] = useState([]);
@@ -34,13 +35,17 @@ export default function Listings() {
             <Header >
                 <h1>Listings</h1>
                 <div className="p-4">
+
+
+
                     {loading ? (
                         <p>Loading...</p>
                     ) : error ? (
                         <p className="text-red-500">{error}</p>
                     ) : listings.length === 0 ? (
                         <p>No listings found.</p>
-                    ) : (
+                    ) : ( 
+
                         <ul className="space-y-4">
                             {listings.map((listing) => (
                                 <li key={listing.id} className="p-4 bg-white rounded shadow">

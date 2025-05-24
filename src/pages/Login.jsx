@@ -1,12 +1,13 @@
 import Header from "../Header";
 import { useState } from 'react';
-
+import {useNavigate} from "react-router-dom";
 
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,6 +42,10 @@ export default function Login() {
             }
 
             setSuccess('Login successful!');
+            
+            setTimeout(() => {
+                navigate('/listings')
+            }, 1500);
             // TODO: Redirect or set user context
         } catch (err) {
             setError(err.message);

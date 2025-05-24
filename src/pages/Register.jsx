@@ -1,5 +1,6 @@
 import Header from "../Header";
 import { useState } from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -14,6 +15,7 @@ export default function Register() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -71,8 +73,11 @@ export default function Register() {
                 bio: "",
                 profile_photo: null,
             });
-        } catch (err) {
-            setError(err.message);
+            setTimeout(() => {
+                navigate("/login")
+            }, 1500);
+        // } catch (err) {
+        //     setError(err.message);
         } finally {
             setLoading(false);
         }
