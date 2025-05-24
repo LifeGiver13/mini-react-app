@@ -1,14 +1,13 @@
+import { useEffect, useState } from "react";
 import Header from "../Header";
 
 export default function Users() {
-
-    // This page is for veiwing registered users and their details.
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        // Fetch users data from the API
         const fetchUsers = async () => {
             try {
-                const response = await fetch("https://lifegiver13.pythonanywhere.com/users", {
+                const response = await fetch("https://lifegiver13.pythonanywhere.com/api/users", {
                     method: "GET",
                     credentials: "include",
                 });
@@ -18,7 +17,7 @@ export default function Users() {
                 }
 
                 const data = await response.json();
-                console.log(data); // Handle the fetched user data as needed
+                setUsers(data); // Save data in state
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
@@ -27,14 +26,26 @@ export default function Users() {
         fetchUsers();
     }, []);
 
-
-
     return (
         <>
             <Header>
                 <h1>Users</h1>
-                <p>This is where you’ll view registered users and their stories.</p>
-            </Header>
+
+                <div className="p-4">
+                    {users.length === 0 ? (
+                        <p>No users found.</p>
+                    ) : (
+                        <ul className="space-y-4">
+                            {users.map((user) => (
+                                <li key={user.id} className="p-4 bg-white rounded shadow">
+                                    <h2 className="text-xl font-bold">{user.username}</h2>
+                                    <p>Email: {user.email_address}</p>
+                                    {/* Add other fields as needed */}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>            </Header>
 
         </>
     );
