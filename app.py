@@ -6,10 +6,10 @@ from datetime import datetime
 import os
 import base64
 
-
-app = Flask(__name__)
-CORS(app, supports_credentials=True)
-
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:5173", 
+    "https://your-vercel-frontend.vercel.app"  # Replace with your real Vercel frontend domain
+])
 # Secret key for session
 app.secret_key = os.environ.get("SECRET_KEY", "supersecret")
 
