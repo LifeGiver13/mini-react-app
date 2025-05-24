@@ -38,17 +38,29 @@ export default function Register() {
         setLoading(true);
 
         try {
+
+
+            if (!form.username || !form.email || !form.password || !form.confirm_password) {
+                throw new Error("All fields are required.");
+            }
+            if (form.password !== form.confirm_password) {
+                throw new Error("Passwords do not match.");
+            }
+            if (form.profile_photo && !form.profile_photo.startsWith("data:image/")) {
+                throw new Error("Invalid profile photo format. Please upload a valid image.");
+            }
             const res = await fetch("https://lifegiver13.pythonanywhere.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(form),
             });
 
             const data = await res.json();
-
             if (!res.ok) {
                 throw new Error(data.message || "Registration failed");
             }
+
 
             setSuccess(data.message);
             setForm({
@@ -69,7 +81,7 @@ export default function Register() {
     return (
         <Header>
             <h1>Register</h1>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} encType="multipart/form-data" >
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {success && <p style={{ color: 'green' }}>{success}</p>}
 
@@ -126,6 +138,7 @@ export default function Register() {
                         type="file"
                         accept="image/*"
                         onChange={handlePhoto}
+
                     />
                 </p>
                 <button type="submit" disabled={loading}>
