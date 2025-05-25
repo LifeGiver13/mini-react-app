@@ -24,6 +24,20 @@ textarea {
     border-radius: 14px;
 }
 
+p a {
+    background-color: #f5deb3;
+    color: #4CAF50;
+    padding: 8px 16px;
+    border-radius: 14px;
+}
+
+a {
+    text-decoration: none;
+    color: #f5deb3;
+    padding: 8px 16px;
+    border-radius: 14px;
+}
+
 #footer {
     background-color: #343a40;
     height: 10vh;
@@ -44,10 +58,6 @@ footer a {
 
 }
 
-a {
-    color: white;
-
-}
 
 #foot-links a {
     color: white;

@@ -6,13 +6,13 @@ export default function Footer() {
             <div id='footbar'>
                 <ul className='foot-links'>
                     <li>
-                        <Link to="#">Policies</Link>
+                        <Link to="#">Policies| </Link>
                     </li>
                     <li>
-                        <Link to="/users">Users</Link>
+                        <Link to="/users">Users| </Link>
                     </li>
                     <li>
-                        <Link to="/listings">Listings</Link>
+                        <Link to="/listings">Listings| </Link>
                     </li>
 
 

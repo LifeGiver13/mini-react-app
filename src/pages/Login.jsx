@@ -40,12 +40,12 @@ export default function Login() {
                 throw new Error(data.message || 'Login failed');
             }
 
-            // ✅ Store login status and user
+            // Store login status and user
             localStorage.setItem("loggedIn", "true");
             localStorage.setItem("user", JSON.stringify(form.username));
             setSuccess('Login successful!');
 
-            // ✅ Redirect after short delay
+            //  Redirect after short delay
             setTimeout(() => {
                 navigate('/users');
             }, 1500);
