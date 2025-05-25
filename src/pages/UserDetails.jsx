@@ -52,7 +52,7 @@ export default function UserDetails() {
                         <div className="flex-cont">
                             <img
                                 src={`https://lifegiver13.pythonanywhere.com/static/images/${user.profile_photo}`}
-                                alt="Profile"
+                                alt="Profile" style={{ width: '100vh', height: '45vh' }}
                             />
                             <div>
                                 <h3>Username: {user.username}</h3>

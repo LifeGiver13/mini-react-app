@@ -18,7 +18,6 @@ export default function Header({ children }) {
         setIsLoggedIn(false);
         navigate("/login");
         window.location.reload();  // Reload to reset state
-        alert("You have been logged out successfully.");
     };
 
     return (

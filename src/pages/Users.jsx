@@ -47,8 +47,13 @@ export default function Users() {
                             <li key={user.user_id} id="myDIV">
                                 <div className="flex-cont">
                                     <div>
+                                        <img
+                                            src={`https://lifegiver13.pythonanywhere.com/static/images/${user.profile_photo}`}
+                                            alt="Profile"
+                                            style={{ borderRadius: '50%', width: '20vh', height: '20vh', objectFit: 'cover' }}
+                                        />
+
                                         <h3 style={{ color: 'green' }}>{user.username}</h3>
-                                        <p>Email: {user.email_address}</p>
                                         <Link to={`/users/${user.user_id}`} style={{ color: '#f5deb3', textDecoration: 'underline' }}>
                                             View Details
                                         </Link>
