@@ -1,18 +1,18 @@
 import Header from "../Header";
 import { useEffect, useState } from "react";
 import "../Listings.css"
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Listings() {
     const [listings, setListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    // const navigate = setNavigate()
+    const navigate = useNavigate()
 
-    // function handleRedirect() {
-    //     onclick => useNavigate("https://lifegiver13.pythonanywhere.com/")
+    function handleRedirect() {
+        window.location.href = "https://lifegiver13.pythonanywhere.com/";
 
-    // }
+    }
 
     useEffect(() => {
         const fetchListings = async () => {
@@ -42,8 +42,9 @@ export default function Listings() {
     return (
         <>
             <Header>
-                <h1 className="text-2xl font-bold text-center my-4">Listings</h1>
+                <h1 >Listings</h1>
                 <div className="container">
+                    <p>Click on the button to Start Reading each of this Novels on the Official Website: <button onClick={handleRedirect} >Go To site</button> </p>
 
                     {loading ? (
                         <p>Loading...</p>
@@ -53,7 +54,6 @@ export default function Listings() {
                         <p>No listings found.</p>
                     ) : (
                         <ul className="list">
-                            <p>Click on the link below to start Reading each of this novels: <button type="redirect" >Go To site</button> </p>
                             {listings.map((listing) => (
                                 <li key={listing.id} id="myDIV">
                                     <div className="flex-cont">

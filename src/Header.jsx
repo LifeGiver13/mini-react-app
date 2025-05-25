@@ -7,8 +7,9 @@ export default function Header({ children }) {
         <>
             <div id="wrapper">
                 <div id="navbar">
-                    <img src="logo.svg" alt="Scroll Saga" className="logo" style={{ width: '190px' }} height={"auto"} />
-
+                    <Link to='/'>
+                        <img className="logo" src="/logo.svg" alt="Scroll Saga" style={{ width: '190px' }} height={"auto"} />
+                    </Link>
                     <input type="checkbox" id="menu-toggle" />
 
                     <label htmlFor="menu-toggle" className="hamburger">&#9776;</label>
