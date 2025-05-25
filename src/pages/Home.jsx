@@ -4,6 +4,7 @@ export default function Home() {
     return (
         <Header>
             <div className="container">
+                <h1> Home</h1>
                 <div id="myDIV">
                     <div className="flex-cont">
                         <div>
