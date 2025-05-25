@@ -11,24 +11,29 @@ export default function Users() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch("https://lifegiver13.pythonanywhere.com/api/users", {
+                const res = await fetch("https://lifegiver13.pythonanywhere.com/api/users", {
                     method: "GET",
                     credentials: "include",
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
+                if (!res.ok) throw new Error("Failed to fetch users");
 
-                const data = await response.json();
-                setUsers(data);
+                const data = await res.json();
+
+                const currentUser = JSON.parse(localStorage.getItem("user"));
+
+                // Filter out current user
+                const filteredUsers = data.filter(user => user.username !== currentUser);
+
+                setUsers(filteredUsers);
             } catch (error) {
-                console.error('Error fetching users:', error);
+                console.error("Error fetching users:", error);
             }
         };
 
         fetchUsers();
     }, []);
+
 
     return (
         <Header>

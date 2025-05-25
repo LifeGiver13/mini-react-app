@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../Header";
-import '../HeadOoter.css'; // styling for #myDIV and .flex-cont
+import '../HeadOoter.css';
 
 export default function UserDetails() {
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    // 🔒 Restrict access to logged-in users
+    useEffect(() => {
+        if (localStorage.getItem("loggedIn") !== "true") {
+            navigate("/login");
+        }
+    }, [navigate]);
 
     useEffect(() => {
         if (!id) return;

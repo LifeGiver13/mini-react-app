@@ -1,6 +1,6 @@
 import Header from "../Header";
 import { useState } from 'react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
@@ -34,20 +34,21 @@ export default function Login() {
                 body: JSON.stringify(form),
             });
 
-
             const data = await res.json();
 
             if (!res.ok) {
                 throw new Error(data.message || 'Login failed');
             }
 
-            setSuccess('Login successful!');
+            // ✅ Store login status and user
+            localStorage.setItem("loggedIn", "true");
             localStorage.setItem("user", JSON.stringify(form.username));
+            setSuccess('Login successful!');
 
+            // ✅ Redirect after short delay
             setTimeout(() => {
-                navigate('/users')
+                navigate('/users');
             }, 1500);
-            // TODO: Redirect or set user context
         } catch (err) {
             setError(err.message);
         } finally {
@@ -56,46 +57,42 @@ export default function Login() {
     };
 
     return (
-        <>
-            <Header >
-                <h1>Login</h1>
-                <form onSubmit={handleSubmit}>
-                    <p>Fill in the form below to login.</p>
-                    <p>
-                        Don’t have an account? <a href="/register">Register</a>
-                    </p>
+        <Header>
+            <h1>Login</h1>
+            <form onSubmit={handleSubmit}>
+                <p>Fill in the form below to login.</p>
+                <p>Don’t have an account? <Link to="/register">Register</Link></p>
 
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                    {success && <p style={{ color: 'green' }}>{success}</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {success && <p style={{ color: 'green' }}>{success}</p>}
 
-                    <p>
-                        <label htmlFor="username">Username:</label><br />
-                        <input
-                            id="username"
-                            name="username"
-                            placeholder="Username"
-                            value={form.username}
-                            onChange={handleChange}
-                        />
-                    </p>
+                <p>
+                    <label htmlFor="username">Username:</label><br />
+                    <input
+                        id="username"
+                        name="username"
+                        placeholder="Username"
+                        value={form.username}
+                        onChange={handleChange}
+                    />
+                </p>
 
-                    <p>
-                        <label htmlFor="password">Password:</label><br />
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="Password"
-                            value={form.password}
-                            onChange={handleChange}
-                        />
-                    </p>
+                <p>
+                    <label htmlFor="password">Password:</label><br />
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Password"
+                        value={form.password}
+                        onChange={handleChange}
+                    />
+                </p>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
-                    </button>
-                </form>
-            </Header>
-        </>
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
+                </button>
+            </form>
+        </Header>
     );
 }
