@@ -1,6 +1,6 @@
 import Header from "../Header";
 import { useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -38,9 +38,9 @@ export default function Register() {
         setSuccess('');
         setError('');
         setLoading(true);
-    
+
         try {
-            // ✅ Client-side validation with returns
+            //  Client-side validation with returns
             if (!form.username || !form.email || !form.password || !form.confirm_password) {
                 setError("All fields are required.");
                 return;
@@ -53,22 +53,22 @@ export default function Register() {
                 setError("Invalid profile photo format. Please upload a valid image.");
                 return;
             }
-    
-            // ✅ API call
+
+            //  API call
             const res = await fetch("https://lifegiver13.pythonanywhere.com/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify(form),
             });
-    
+
             const data = await res.json();
-    
+
             if (!res.ok) {
-                // ✅ Error from API
+                //  Error from API
                 throw new Error(data.message || "Registration failed");
             }
-    
+
             setSuccess(data.message);
             setForm({
                 username: "",
@@ -78,21 +78,21 @@ export default function Register() {
                 bio: "",
                 profile_photo: null,
             });
-    
-            // ✅ Redirect after success
+
+            //  Redirect after success
             setTimeout(() => {
                 navigate("/login");
             }, 1500);
         } catch (err) {
-            // ✅ Catch block restored
+            //  Catch block restored
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
-    
 
-  
+
+
 
     return (
         <Header>
@@ -100,8 +100,8 @@ export default function Register() {
             <p>Fill in the form below to Register.</p>
 
             <form onSubmit={handleSubmit} encType="multipart/form-data" >
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-                    {success && <p style={{ color: 'green' }}>{success}</p>}
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {success && <p style={{ color: 'green' }}>{success}</p>}
 
 
                 <p>
