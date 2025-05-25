@@ -9,7 +9,7 @@ export default function UserDetails() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // 🔒 Restrict access to logged-in users
+    // Restrict access to logged-in users
     useEffect(() => {
         if (localStorage.getItem("loggedIn") !== "true") {
             navigate("/login");
@@ -52,7 +52,7 @@ export default function UserDetails() {
                         <div className="flex-cont">
                             <img
                                 src={`https://lifegiver13.pythonanywhere.com/static/images/${user.profile_photo}`}
-                                alt="Profile" style={{ width: '100vh', height: '45vh' }}
+                                alt="Profile"
                             />
                             <div>
                                 <h3>Username: {user.username}</h3>
