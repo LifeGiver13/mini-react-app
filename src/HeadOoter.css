@@ -289,3 +289,15 @@ h1 {
     max-width: 300px;
     text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.18);
 }
+
+.search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 8px 16px;
+    box-shadow: 0 2px 8px rgba(52, 58, 64, 0.08);
+    max-width: 400px;
+    margin: 0 auto 24px auto;
+}

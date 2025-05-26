@@ -76,7 +76,7 @@ export default function Register() {
                 password: "",
                 confirm_password: "",
                 bio: "",
-                profile_photo: null,
+                profile_photo: "default.png",
             });
 
             //  Redirect after success
