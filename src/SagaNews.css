@@ -45,24 +45,24 @@
 /* Mobile enhancements */
 @media (min-width: 310px) and (max-width: 600px) {
 
+    .release-table-wrapper {
+        padding: 0 5px;
+        overflow-x: auto;
+    }
+
+    .release-table {
+        min-width: 600px;
+        font-size: 0.9em;
+    }
+
     .release-table th,
     .release-table td {
-        padding: 10px 10px;
-        font-size: 0.9em;
+        padding: 10px 8px;
+        font-size: 0.95em;
+        white-space: nowrap;
     }
 
     .release-table th {
         font-size: 1em;
     }
-
-    .release-table-wrapper {
-        padding: 0 10px;
-    }
-}
-
-.search input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 200px;
 }
