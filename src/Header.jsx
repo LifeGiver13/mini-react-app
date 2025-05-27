@@ -43,8 +43,8 @@ export default function Header({ children }) {
 
                             {!isLoggedIn ? (
                                 <>
-                                    <li><Link to="/register">Register</Link></li>
-                                    <li><Link to="/login">Login</Link></li>
+                                    <li><Link to="/register" className='btn'>Register</Link></li>
+                                    <li><Link to="/login" className='btn'>Login</Link></li>
                                 </>
                             ) : (
                                 <li><button type='button' onClick={handleLogout} className="logout-btn">Logout</button></li>
@@ -53,7 +53,8 @@ export default function Header({ children }) {
                     </div>
                 </div>
 
-                <div id="content">
+                <div id='content'  >
+
                     {children}
                 </div>
 

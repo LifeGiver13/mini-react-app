@@ -4,14 +4,26 @@
     z-index: 10;
 }
 
+.btn {
+    color: black;
+    display: flex;
+    width: 70%;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, #f5deb3, #343a40, #f5deb3);
+}
+
 .logout-btn {
-    background: none;
-    border: none;
-    color: #f5deb3;
+    background: linear-gradient(to bottom, #f5deb3, #fff, #f5deb3);
+    color: black;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-weight: bold;
+    background-color: #f2f2f2;
+    border-radius: 14px;
     font-size: 1rem;
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
+    padding: 12px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 input,
