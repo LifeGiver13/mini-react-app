@@ -35,7 +35,7 @@ export default function Listings() {
 
     return (
         <Header>
-            <h1>Novel Listings</h1>
+            <h1>Trending</h1>
             {!isLoggedIn ? (
                 <p className="p-4 text-red-500">You must be logged in to view listings.</p>
             ) : loading ? (

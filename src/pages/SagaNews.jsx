@@ -29,9 +29,11 @@ export default function SagaNews() {
     return (
         <>
             <Header>
-                <h1>Saga News</h1>
+                <h1>
+                    Saga News
+                    {/* <img src="/logo.svg" alt="Saga News" /> */}
+                </h1>
                 <div>
-                    <img style={{ width: '100%' }} src="/sagaNews.png" alt="Saga News" />
                     <p>
                         Welcome to Saga News, your go-to source for the latest updates and insights on the world of Saga. Stay informed with our comprehensive coverage of news, events, and developments in the Saga ecosystem.
                     </p>

@@ -69,6 +69,10 @@ footer a {
 
 #footer li {
     display: inline;
+    margin-right: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #f5deb3;
 }
 
 #footer li a:hover {
@@ -97,6 +101,8 @@ button {
 #navbar a {
     color: white;
     text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
     padding: 14px 20px;
     display: inline-block;
 }
@@ -110,10 +116,12 @@ button {
     color: black;
 }
 
+
+
 /* Main content area */
 #content {
     padding: 20px;
-    background-color: burlywood;
+    background: linear-gradient(to bottom, #f5deb3, #fff, #f5deb3);
     margin: 0;
 }
 
@@ -281,13 +289,14 @@ h1 {
     font-size: 1.8rem;
     letter-spacing: 2px;
     color: #fff;
-    background: linear-gradient(90deg, #343a40 60%, #4CAF50 100%);
+    background: linear-gradient(to right, #f5deb3, #343a40);
     padding: 18px 32px;
     border-radius: 16px;
     box-shadow: 0 6px 24px rgba(52, 58, 64, 0.18);
     margin: 24px auto 32px auto;
     max-width: 300px;
     text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.18);
+
 }
 
 .search {
