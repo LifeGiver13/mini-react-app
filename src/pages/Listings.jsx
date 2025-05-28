@@ -1,6 +1,5 @@
 import Header from "../Header";
 import { useEffect, useState } from "react";
-import "../Listings.css";
 import { useNavigate } from "react-router-dom";
 
 export default function Listings() {
@@ -45,10 +44,12 @@ export default function Listings() {
             ) : listings.length === 0 ? (
                 <p>No listings found.</p>
             ) : (
-                <div className="container">
-                    <p>
+                <div className="container" style={{
+                    padding: '20px', backgroundImage: 'url(/man.png)', width: '100%',
+                    color: 'black', fontFamily: 'Arial, sans-serif', fontWeight: 'bold'
+                }}>                    <p>
                         Click on the button to Start Reading each of these Novels on the Official Website:{" "}
-                        <button onClick={handleRedirect}>Go To Site</button>
+                        <button onClick={handleRedirect} className="logout-btn">Go To Site</button>
                     </p>
                     <ul className="list">
                         {listings.map((l) => (

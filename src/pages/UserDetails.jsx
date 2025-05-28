@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../Header";
-import '../HeadOoter.css';
 
 export default function UserDetails() {
     const { id } = useParams();

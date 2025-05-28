@@ -2,6 +2,7 @@ import Header from "../Header";
 import { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 
+
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
@@ -42,6 +43,7 @@ export default function Login() {
 
             // Store login status and user
             localStorage.setItem("loggedIn", "true");
+            localStorage.setItem("user", JSON.stringify(form.user_id));
             localStorage.setItem("user", JSON.stringify(form.username));
             setSuccess('Login successful!');
 
@@ -59,40 +61,44 @@ export default function Login() {
     return (
         <Header>
             <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <p>Fill in the form below to login.</p>
-                <p>Don’t have an account? <Link to="/register">Register</Link></p>
 
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
+            <div className="container" style={{ padding: '20px', backgroundImage: 'url(/ScrollUser.png)', width: '100%', color: 'black', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>
 
-                <p>
-                    <label htmlFor="username">Username:</label><br />
-                    <input
-                        id="username"
-                        name="username"
-                        placeholder="Username"
-                        value={form.username}
-                        onChange={handleChange}
-                    />
-                </p>
+                <form onSubmit={handleSubmit}>
+                    <p>Fill in the form below to login.</p>
+                    <p>Don’t have an account? <Link to="/register">Register</Link></p>
 
-                <p>
-                    <label htmlFor="password">Password:</label><br />
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={form.password}
-                        onChange={handleChange}
-                    />
-                </p>
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {success && <p style={{ color: 'green' }}>{success}</p>}
 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+                    <p>
+                        <label htmlFor="username">Username:</label><br />
+                        <input
+                            id="username"
+                            name="username"
+                            placeholder="Username"
+                            value={form.username}
+                            onChange={handleChange}
+                        />
+                    </p>
+
+                    <p>
+                        <label htmlFor="password">Password:</label><br />
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={handleChange}
+                        />
+                    </p>
+
+                    <button type="submit" className="logout-btn" disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
+            </div>
         </Header>
     );
 }

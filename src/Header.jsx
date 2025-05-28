@@ -2,6 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Footer from './Footer';
 import './HeadOoter.css';
+import "./Listings.css";
+import './SagaNews.css';
+
 
 export default function Header({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);

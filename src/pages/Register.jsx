@@ -96,77 +96,85 @@ export default function Register() {
 
     return (
         <Header>
+
             <h1>Register</h1>
-            <p>Fill in the form below to Register.</p>
 
-            <form onSubmit={handleSubmit} encType="multipart/form-data" >
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {success && <p style={{ color: 'green' }}>{success}</p>}
+            <div className="container" style={{ padding: '20px', backgroundImage: 'url(/ScrollUser.png)', width: '100%', color: 'black', fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>
 
 
-                <p>
-                    <input
-                        name="username"
-                        placeholder="Username"
-                        value={form.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </p>
-                <p>
-                    <input
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </p>
-                <p>
-                    <input
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={form.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </p>
-                <p>
-                    <input
-                        name="confirm_password"
-                        type="password"
-                        placeholder="Confirm Password"
-                        value={form.confirm_password}
-                        onChange={handleChange}
-                        required
-                    />
-                </p>
-                <p>
-                    <textarea
-                        name="bio"
-                        placeholder="Your bio..."
-                        value={form.bio}
-                        onChange={handleChange}
-                    ></textarea>
-                </p>
-                <p>
-                    <label htmlFor="profile_photo">Profile Photo:</label><br />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhoto}
+                <form onSubmit={handleSubmit} encType="multipart/form-data" >
 
-                    />
-                </p>
-                <button type="submit" disabled={loading}>
-                    {loading ? "Registering..." : "Register"}
-                </button>
-                <p>
-                    <a href="/login">Already have an account? Login</a>
-                </p>
-            </form>
+                    <p>Fill in the form below to Register.</p>
+
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
+                    {success && <p style={{ color: 'green' }}>{success}</p>}
+
+
+
+                    <p>
+                        <input
+                            name="username"
+                            placeholder="Username"
+                            value={form.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </p>
+                    <p>
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="Email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </p>
+                    <p>
+                        <input
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </p>
+                    <p>
+                        <input
+                            name="confirm_password"
+                            type="password"
+                            placeholder="Confirm Password"
+                            value={form.confirm_password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </p>
+                    <p>
+                        <textarea
+                            name="bio"
+                            placeholder="Your bio..."
+                            value={form.bio}
+                            onChange={handleChange}
+                        ></textarea>
+                    </p>
+                    <p>
+                        <label htmlFor="profile_photo">Profile Photo:</label><br />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhoto}
+
+                        />
+                    </p>
+                    <button type="submit" disabled={loading} className="logout-btn">
+                        {loading ? "Registering..." : "Register"}
+                    </button>
+                    <p>
+                        <a href="/login">Already have an account? Login</a>
+                    </p>
+                </form>
+            </div>
         </Header>
     );
 }

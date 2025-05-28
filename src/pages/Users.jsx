@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Header from "../Header";
 import { Link } from "react-router-dom";
-import '../HeadOoter.css';
-import "../Listings.css"
 
 
 export default function Users() {

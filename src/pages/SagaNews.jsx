@@ -1,6 +1,5 @@
 import Header from "../Header";
 import { useEffect, useState } from "react";
-import '../SagaNews.css';
 
 export default function SagaNews() {
     const [novels, setListings] = useState([]);
