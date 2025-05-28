@@ -12,17 +12,19 @@ export default function Header({ children }) {
 
     useEffect(() => {
         const user = localStorage.getItem("user");
-        setIsLoggedIn(!!user);  // true if user exists
+        setIsLoggedIn(!!user);
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        localStorage.setItem("loggedIn", "false");
+        localStorage.removeItem("loggedIn");
+        localStorage.setItem('isLoggedIn', 'false');
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
         setIsLoggedIn(false);
         navigate("/login");
         window.location.reload();  // Reload to reset state
     };
-
     return (
         <>
             <div id="wrapper">

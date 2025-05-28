@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 
 export default function Login() {
-    const [form, setForm] = useState({ username: '', password: '' });
+    const [form, setForm] = useState({ user_id: '', username: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -28,7 +28,7 @@ export default function Login() {
         }
 
         try {
-            const res = await fetch("https://lifegiver13.pythonanywhere.com/login", {
+            const res = await fetch("https://lifegiver13.pythonanywhere.com/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -41,22 +41,66 @@ export default function Login() {
                 throw new Error(data.message || 'Login failed');
             }
 
-            // Store login status and user
+            setForm((prev) => ({ ...prev, user_id: data.user_id }));
             localStorage.setItem("loggedIn", "true");
-            localStorage.setItem("user", JSON.stringify(form.user_id));
-            localStorage.setItem("user", JSON.stringify(form.username));
+            localStorage.setItem("userId", data.user_id);
+            localStorage.setItem("username", form.username);
+            // Save the user object for Header's isLoggedIn check
+            localStorage.setItem("user", JSON.stringify({ user_id: data.user_id, username: form.username }));
             setSuccess('Login successful!');
-
-            //  Redirect after short delay
             setTimeout(() => {
                 navigate('/trend');
             }, 1500);
+
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setError('');
+    //     setSuccess('');
+
+    //     if (!form.username || !form.password) {
+    //         setError('Both fields are required.');
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     try {
+    //         const res = await fetch("https://lifegiver13.pythonanywhere.com/login", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             credentials: "include",
+    //             body: JSON.stringify(form),
+    //         });
+
+    //         const data = await res.json();
+
+    //         if (!res.ok) {
+    //             throw new Error(data.message || 'Login failed');
+    //         }
+
+    //         // Store login status and user
+    //         localStorage.setItem("loggedIn", "true");
+    //         localStorage.setItem("user", JSON.stringify(form.user_id));
+    //         localStorage.setItem("user", JSON.stringify(form.username));
+    //         setSuccess('Login successful!');
+
+    //         //  Redirect after short delay
+    //         setTimeout(() => {
+    //             navigate('/users');
+    //         }, 1500);
+    //     } catch (err) {
+    //         setError(err.message);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     return (
         <Header>
@@ -72,6 +116,11 @@ export default function Login() {
                     {success && <p style={{ color: 'green' }}>{success}</p>}
 
                     <p>
+                        <label htmlFor="userId"></label>
+                        <input id="userId" name="userId" type="hidden" value={form.user_id} onChange={handleChange} />
+                    </p>
+                    <p>
+
                         <label htmlFor="username">Username:</label><br />
                         <input
                             id="username"
@@ -99,6 +148,6 @@ export default function Login() {
                     </button>
                 </form>
             </div>
-        </Header>
+        </Header >
     );
 }
