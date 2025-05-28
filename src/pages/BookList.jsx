@@ -7,13 +7,13 @@ export default function BookList() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        // Check login status and user ID in localStorage
-        const isLoggedIn = localStorage.getItem("loggedIn") === "true";
-        const userId = localStorage.getItem("userId");
-        if (!isLoggedIn || !userId) {
-            window.location.href = "/login";
-            return;
-        }
+        // // Check login status and user ID in localStorage
+        // const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+        // const userId = localStorage.getItem("userId");
+        // if (!isLoggedIn || !userId) {
+        //     window.location.href = "/login";
+        //     return;
+        // }
 
         const fetchBookList = async () => {
             try {

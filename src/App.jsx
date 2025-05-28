@@ -15,10 +15,10 @@ export default function App() {
     <Routes>
       <Route path='/sagaNews' element={<SagaNews />} />
 
-      <Route path="/home" element={<Home />} />
+      <Route path="/" element={<Home />} />
       <Route path="/users" element={<Users />} />
       <Route path="/users/:id" element={<UserDetails />} />
-      <Route path="/" element={<Listings />} />
+      <Route path="/trend" element={<Listings />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path='/about' element={<About />} />

@@ -49,7 +49,7 @@ export default function Login() {
 
             //  Redirect after short delay
             setTimeout(() => {
-                navigate('/users');
+                navigate('/trend');
             }, 1500);
         } catch (err) {
             setError(err.message);

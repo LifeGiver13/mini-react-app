@@ -35,13 +35,13 @@ export default function Header({ children }) {
 
                     <div className="nav-container">
                         <ul className="nav-links">
-                            <li><Link to="/home">Home</Link></li>
+                            <li><Link to="/">Home</Link></li>
                             <li><Link to='/about'>About</Link></li>
                             <li><Link to='/sagaNews'>Saga News</Link></li>
                             <li><Link to="/search">Search</Link></li>
 
                             {/* <li><Link to="/users">Users</Link></li> */}
-                            <li><Link to="/">Trending</Link></li>
+                            <li><Link to="/trend">Trending</Link></li>
                             <li><Link to="/bookList">Book List</Link></li>
 
                             {!isLoggedIn ? (
