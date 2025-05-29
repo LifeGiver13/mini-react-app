@@ -9,6 +9,7 @@ export default function BookList() {
     const navigate = useNavigate();
 
     const isLoggedIn = localStorage.getItem("loggedIn") === "true"; // 🔒 check login statu
+    const handleDetailsRedirect = () => window.location.href = `https://lifegiver13.pythonanywhere.com/api/novels/${l.id}/${l.novel_title}`;
 
 
     useEffect(() => {
@@ -58,22 +59,32 @@ export default function BookList() {
                 novels.length === 0 ? (
                     <p>No listings found.</p>
                 ) : (
+                    <div className="container" style={{
+                        padding: '20px', backgroundImage: 'url(/man.png)', width: '100%',
+                        color: 'black', fontFamily: 'Arial, sans-serif', fontWeight: 'bold'
+                    }}>
 
-                    <ul className="list">
-                        {novels.map((novel) => (
-                            <div key={novel.novel_id} className="book-card" id="myDIV" >
-                                <div className="flex-cont">
-                                    <h2>{novel.novel_title}</h2>
-                                    <img src={`https://lifegiver13.pythonanywhere.com/static/images/${novel.cover_image}`} />
+                        <ul className="list">
+                            {novels.map((novel) => (
+                                <div key={novel.novel_id} className="book-card" id="myDIV" >
+                                    <div className="flex-cont">
+                                        <h2>{novel.novel_title}</h2>
+                                        <img src={`https://lifegiver13.pythonanywhere.com/static/images/${novel.cover_image}`} />
 
-                                    <p>by {novel.author}</p>
+                                        <p>by {novel.author}</p>
+                                        <button className="logout-btn" onClick={handleDetailsRedirect}>Read Now!</button>
+
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </ul>
+                            ))}
+                        </ul>
+                    </div>
                 )
             )
             }
+
+
+
 
 
         </Header>

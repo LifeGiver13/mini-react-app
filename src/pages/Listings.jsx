@@ -11,6 +11,8 @@ export default function Listings() {
     const isLoggedIn = localStorage.getItem("loggedIn") === "true"; // 🔒 check login status
 
     const handleRedirect = () => window.location.href = "https://lifegiver13.pythonanywhere.com/";
+    const handleDetailsRedirect = () => window.location.href = `https://lifegiver13.pythonanywhere.com/api/novels/${l.id}/${l.novel_title}`;
+
 
     useEffect(() => {
         if (!isLoggedIn) {
@@ -65,6 +67,7 @@ export default function Listings() {
                                         <h3>{l.novel_title}</h3>
                                         <h4>Author: {l.author}</h4>
                                         <p>{l.description}</p>
+                                        <button className="logout-btn" onClick={handleDetailsRedirect}>Read Now!</button>
                                     </div>
                                 </div>
                             </li>
