@@ -17,6 +17,7 @@ export default function BookList() {
 
             if (!userId) {
                 setError("User not logged in.");
+                navigate('/login')
 
                 setLoading(false);
                 return;

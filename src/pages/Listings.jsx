@@ -13,7 +13,9 @@ export default function Listings() {
     const handleRedirect = () => window.location.href = "https://lifegiver13.pythonanywhere.com/";
 
     useEffect(() => {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) {
+            navigate('/login')
+        };
         const fetchListings = async () => {
             try {
                 const res = await fetch("https://lifegiver13.pythonanywhere.com/api/novels", {

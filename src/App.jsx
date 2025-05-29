@@ -9,6 +9,9 @@ import About from './pages/About';
 import SagaNews from './pages/SagaNews';
 import BookList from './pages/BookList';
 import Search from './pages/Search';
+import NovelDetailPage from './pages/NovelDetails';
+import Header from './Header';
+
 
 export default function App() {
   return <Router>
@@ -24,6 +27,15 @@ export default function App() {
       <Route path='/about' element={<About />} />
       <Route path='/bookList' element={<BookList />} />
       <Route path='/search' element={<Search />} />
+      <Route path='/novel/:novelId' element={<NovelDetailPage />} />
+      <Route path='*' element={
+        <Header>        <h1>404 Not Found</h1>
+          <p><center>The page you are looking for does not exist.</center></p>
+        </Header>
+
+      } />
+
+
     </Routes>
   </Router>
 }
