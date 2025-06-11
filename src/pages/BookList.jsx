@@ -9,8 +9,11 @@ export default function BookList() {
     const navigate = useNavigate();
 
     const isLoggedIn = localStorage.getItem("loggedIn") === "true"; // 🔒 check login statu
-    const handleDetailsRedirect = () => window.location.href = `https://lifegiver13.pythonanywhere.com/api/novels/${l.id}/${l.novel_title}`;
 
+    const handleDetailsRedirect = (novel_id, novel_title) => {
+        const formattedTitle = novel_title.toLowerCase().replace(/\s+/g, '-');
+        window.location.href = `https://lifegiver13.pythonanywhere.com/novel/${novel_id}/${formattedTitle}`;
+    };
 
     useEffect(() => {
         const fetchBookList = async () => {
@@ -72,8 +75,8 @@ export default function BookList() {
                                         <img src={`https://lifegiver13.pythonanywhere.com/static/images/${novel.cover_image}`} />
 
                                         <p>by {novel.author}</p>
-                                        <button className="logout-btn" onClick={handleDetailsRedirect}>Read Now!</button>
-
+                                        <button className="logout-btn" onClick={() => handleDetailsRedirect(novel.novel_id, novel.novel_title)}
+                                        >Read Now!</button>
                                     </div>
                                 </div>
                             ))}

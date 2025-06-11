@@ -11,7 +11,11 @@ export default function Listings() {
     const isLoggedIn = localStorage.getItem("loggedIn") === "true"; // 🔒 check login status
 
     const handleRedirect = () => window.location.href = "https://lifegiver13.pythonanywhere.com/";
-    const handleDetailsRedirect = () => window.location.href = `https://lifegiver13.pythonanywhere.com/api/novels/${l.id}/${l.novel_title}`;
+
+    const handleDetailsRedirect = (novel_id, novel_title) => {
+        const formattedTitle = novel_title.toLowerCase().replace(/\s+/g, '-');
+        window.location.href = `https://lifegiver13.pythonanywhere.com/novel/${novel_id}/${formattedTitle}`;
+    };
 
 
     useEffect(() => {
@@ -67,14 +71,16 @@ export default function Listings() {
                                         <h3>{l.novel_title}</h3>
                                         <h4>Author: {l.author}</h4>
                                         <p>{l.description}</p>
-                                        <button className="logout-btn" onClick={handleDetailsRedirect}>Read Now!</button>
+                                        <button className="logout-btn" onClick={() => handleDetailsRedirect(l.novel_id, l.novel_title)}
+                                        >Read Now!</button>
                                     </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                                </div >
+                            </li >
+                        ))
+                        }
+                    </ul >
+                </div >
             )}
-        </Header>
+        </Header >
     );
 }
