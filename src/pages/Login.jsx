@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../Header";
-import { API_ENDPOINTS, buildApiUrl } from "../constants/api";
+import {
+  API_ENDPOINTS,
+  buildApiUrl,
+  getUserFriendlyErrorMessage,
+} from "../constants/api";
 
 export default function Login() {
   const [form, setForm] = useState({ user_id: "", username: "", password: "" });
@@ -56,7 +60,12 @@ export default function Login() {
         navigate("/trend");
       }, 1200);
     } catch (err) {
-      setError(err.message);
+      setError(
+        getUserFriendlyErrorMessage(
+          err,
+          "Unable to login right now. Please check your connection and refresh.",
+        ),
+      );
     } finally {
       setLoading(false);
     }

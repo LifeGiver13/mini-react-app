@@ -47,6 +47,7 @@ a {
 
 .nav-container {
   flex: 1;
+  min-width: 0;
 }
 
 .nav-links {
@@ -54,7 +55,7 @@ a {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.9rem;
+  gap: 1.05rem;
   margin: 0;
   padding: 0;
 }
@@ -72,6 +73,46 @@ a {
 .nav-link.active {
   background: #f5deb3;
   color: #343a40;
+}
+
+.mobile-profile-row {
+  display: none;
+}
+
+.desktop-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-left: 0.85rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 222, 179, 0.4);
+  background: rgba(245, 222, 179, 0.12);
+  color: #f5deb3;
+  max-width: min(230px, 30vw);
+  min-width: 0;
+}
+
+.desktop-profile-link:hover {
+  background: rgba(245, 222, 179, 0.22);
+}
+
+.desktop-profile-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.header-avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(245, 222, 179, 0.6);
+  background: #fff;
 }
 
 .btn {
@@ -258,6 +299,24 @@ textarea {
   font-weight: 700;
 }
 
+.profile-edit-form {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-align: left;
+}
+
+.profile-edit-form h4 {
+  margin: 0.2rem 0;
+  color: #f5deb3;
+}
+
+.profile-edit-form label {
+  font-weight: 700;
+  color: #f5deb3;
+}
+
 button {
   font-family: "Segoe UI", Arial, sans-serif;
 }
@@ -395,6 +454,30 @@ button {
     gap: 0.85rem;
   }
 
+  .mobile-profile-row {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .mobile-profile-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    min-height: 58px;
+    padding: 0.7rem 0.85rem;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 222, 179, 0.35);
+    background: rgba(245, 222, 179, 0.12);
+    color: #f5deb3;
+    font-weight: 700;
+  }
+
+  .mobile-profile-link .header-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
   .nav-links li {
     width: 100%;
   }
@@ -423,6 +506,10 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .desktop-profile-link {
+    display: none;
   }
 }
 

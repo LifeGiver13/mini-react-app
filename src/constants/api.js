@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
   register: "/register",
   users: "/api/users",
   userDetails: (userId) => `/api/users/${encodeURIComponent(userId)}`,
+  profile: "/api/profile",
   profilePhoto: "/api/profile/photo",
   saveNovel: (novelId) => `/api/save_novel/${encodeURIComponent(novelId)}`,
   unsaveNovel: (novelId) => `/api/unsave_novel/${encodeURIComponent(novelId)}`,
@@ -23,11 +24,9 @@ export const API_ENDPOINTS = {
     `/chapter/${encodeURIComponent(novelId)}/${encodeURIComponent(
       chapterNumber,
     )}`,
-  // Currently non-functional in backend (returns 404), kept as placeholders.
   novelStats: (novelId) => `/api/novels/${encodeURIComponent(novelId)}/stats`,
   trackNovelView: (novelId) =>
     `/api/novels/${encodeURIComponent(novelId)}/view`,
-  // Placeholder endpoints for future ratings and reviews support.
   rateNovel: (novelId) => `/api/novels/${encodeURIComponent(novelId)}/rating`,
   novelReviews: (novelId) =>
     `/api/novels/${encodeURIComponent(novelId)}/reviews`,
@@ -65,6 +64,52 @@ export const buildRequestHeaders = (
 
 export const buildImageUrl = (imageName) =>
   imageName ? buildApiUrl(API_ENDPOINTS.image(imageName)) : "";
+
+export const getProfilePhotoUrl = (photoName) => {
+  const value = String(photoName ?? "").trim();
+  if (!value) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(value) || /^data:image\//i.test(value)) {
+    return value;
+  }
+
+  return buildImageUrl(value);
+};
+
+export const normalizeAverageRating = (rating, fallback = 3) => {
+  const numeric = Number(rating);
+  if (Number.isNaN(numeric) || numeric <= 0) {
+    return fallback;
+  }
+
+  return Math.min(5, Math.max(1, numeric));
+};
+
+export const getUserFriendlyErrorMessage = (
+  error,
+  fallback = "Something went wrong. Please refresh and try again.",
+) => {
+  const rawMessage = String(error?.message ?? error ?? "").trim();
+  if (!rawMessage) {
+    return fallback;
+  }
+
+  const normalized = rawMessage.toLowerCase();
+  const hasNetworkIssue =
+    normalized.includes("failed to fetch") ||
+    normalized.includes("networkerror") ||
+    normalized.includes("network request failed") ||
+    normalized.includes("load failed") ||
+    normalized.includes("timeout");
+
+  if (hasNetworkIssue) {
+    return "Connection issue detected. Please check your internet and refresh.";
+  }
+
+  return rawMessage;
+};
 
 export const getNovelId = (novel) => novel?.novel_id ?? novel?.id ?? null;
 

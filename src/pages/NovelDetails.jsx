@@ -4,7 +4,6 @@ import Header from "../Header";
 import {
   API_ENDPOINTS,
   buildApiUrl,
-  buildImageUrl,
   buildRequestHeaders,
   getCurrentUserId,
   getNovelAuthor,
@@ -13,6 +12,9 @@ import {
   getNovelId,
   getNovelSlug,
   getNovelTitle,
+  getProfilePhotoUrl,
+  getUserFriendlyErrorMessage,
+  normalizeAverageRating,
 } from "../constants/api";
 
 const splitChapterContent = (rawContent) => {
@@ -54,12 +56,30 @@ const formatReviewDate = (publishTime) => {
   return parsedDate.toLocaleString();
 };
 
+const getReviewsFromPayload = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.reviews)) {
+    return payload.reviews;
+  }
+
+  return null;
+};
+
+const buildStars = (averageRating) => {
+  const rounded = Math.round(normalizeAverageRating(averageRating, 3));
+  return `${"\u2605".repeat(rounded)}${"\u2606".repeat(5 - rounded)}`;
+};
+
 export default function NovelDetailPage() {
   const { novelId, novelTitle } = useParams();
   const [novel, setNovel] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [novelStats, setNovelStats] = useState(null);
   const [activeRouteTitle, setActiveRouteTitle] = useState("");
   const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
@@ -68,6 +88,7 @@ export default function NovelDetailPage() {
   const [ratingValue, setRatingValue] = useState("5");
   const [ratingLoading, setRatingLoading] = useState(false);
   const [error, setError] = useState("");
+  const [statsError, setStatsError] = useState("");
   const [chapterError, setChapterError] = useState("");
   const [commentError, setCommentError] = useState("");
   const [commentSuccess, setCommentSuccess] = useState("");
@@ -75,6 +96,13 @@ export default function NovelDetailPage() {
   const [ratingSuccess, setRatingSuccess] = useState("");
 
   const readNovelId = Number(novelId);
+  const currentUserId = getCurrentUserId();
+
+  const hasUserRated =
+    novelStats?.current_user_rating !== null &&
+    novelStats?.current_user_rating !== undefined;
+  const averageRating = normalizeAverageRating(novelStats?.average_rating, 3);
+  const ratingsCount = Number(novelStats?.ratings_count ?? 0);
 
   const loadChapter = useCallback(
     async (chapterNumber, withLoadingState = true) => {
@@ -103,7 +131,12 @@ export default function NovelDetailPage() {
 
         setCurrentChapter(chapterData);
       } catch (loadError) {
-        setChapterError(loadError.message || "Failed to load chapter.");
+        setChapterError(
+          getUserFriendlyErrorMessage(
+            loadError,
+            "Unable to load this chapter. Please refresh and try again.",
+          ),
+        );
       } finally {
         if (withLoadingState) {
           setChapterLoading(false);
@@ -113,10 +146,133 @@ export default function NovelDetailPage() {
     [readNovelId],
   );
 
+  const loadNovelStats = useCallback(async () => {
+    if (!readNovelId || Number.isNaN(readNovelId)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.novelStats(readNovelId)), {
+        method: "GET",
+        headers: buildRequestHeaders({ Accept: "application/json" }, { includeUserId: true }),
+      });
+      const payload = await tryParseJson(response);
+
+      if (!response.ok || !payload) {
+        throw new Error("Failed to load novel stats.");
+      }
+
+      setNovelStats(payload);
+      setStatsError("");
+
+      if (
+        payload.current_user_rating !== null &&
+        payload.current_user_rating !== undefined
+      ) {
+        setRatingValue(String(payload.current_user_rating));
+      }
+    } catch (fetchError) {
+      setStatsError(
+        getUserFriendlyErrorMessage(
+          fetchError,
+          "Unable to load rating stats. Please refresh and try again.",
+        ),
+      );
+    }
+  }, [readNovelId]);
+
+  const trackNovelView = useCallback(async () => {
+    if (!readNovelId || Number.isNaN(readNovelId)) {
+      return;
+    }
+
+    try {
+      await fetch(buildApiUrl(API_ENDPOINTS.trackNovelView(readNovelId)), {
+        method: "POST",
+        headers: buildRequestHeaders(
+          { Accept: "application/json", "Content-Type": "application/json" },
+          { includeUserId: true },
+        ),
+        body: JSON.stringify({}),
+      });
+    } catch {
+      // View tracking should never block reading.
+    }
+  }, [readNovelId]);
+
+  const refreshReviews = useCallback(
+    async ({ routeTitle = "", fallbackReviews = [] } = {}) => {
+      try {
+        const reviewRes = await fetch(buildApiUrl(API_ENDPOINTS.novelReviews(readNovelId)), {
+          method: "GET",
+          headers: buildRequestHeaders(
+            { Accept: "application/json" },
+            { includeUserId: true },
+          ),
+        });
+        const reviewPayload = await tryParseJson(reviewRes);
+        const reviewList = getReviewsFromPayload(reviewPayload);
+
+        if (reviewRes.ok && reviewList) {
+          setReviews(reviewList);
+          return;
+        }
+      } catch {
+        // Fall back to novel details reviews.
+      }
+
+      try {
+        const commentsRes = await fetch(
+          buildApiUrl(
+            `${API_ENDPOINTS.comments}?novel_id=${encodeURIComponent(String(readNovelId))}`,
+          ),
+          {
+            method: "GET",
+            headers: buildRequestHeaders(
+              { Accept: "application/json" },
+              { includeUserId: true },
+            ),
+          },
+        );
+        const commentsPayload = await tryParseJson(commentsRes);
+        const commentList = getReviewsFromPayload(commentsPayload);
+
+        if (commentsRes.ok && commentList) {
+          setReviews(commentList);
+          return;
+        }
+      } catch {
+        // Fall back to novel details reviews.
+      }
+
+      if (routeTitle) {
+        try {
+          const detailsRes = await fetch(
+            buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, routeTitle)),
+            {
+              method: "GET",
+              headers: { Accept: "application/json" },
+            },
+          );
+          const detailsPayload = await tryParseJson(detailsRes);
+
+          if (detailsRes.ok && detailsPayload) {
+            setReviews(Array.isArray(detailsPayload.reviews) ? detailsPayload.reviews : []);
+            return;
+          }
+        } catch {
+          // Fall through to fallback reviews.
+        }
+      }
+
+      setReviews(Array.isArray(fallbackReviews) ? fallbackReviews : []);
+    },
+    [readNovelId],
+  );
+
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     const trimmedComment = commentText.trim();
-    const userId = getCurrentUserId();
 
     setCommentError("");
     setCommentSuccess("");
@@ -126,52 +282,104 @@ export default function NovelDetailPage() {
       return;
     }
 
-    if (!activeRouteTitle) {
-      setCommentError("Unable to post comment right now. Refresh and try again.");
-      return;
-    }
-
-    if (!userId) {
+    if (!currentUserId) {
       setCommentError("Missing user id. Please log in again.");
       return;
     }
 
     setCommentLoading(true);
     try {
-      const postResponse = await fetch(
-        buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
-        {
+      let postPayload = null;
+      let postWorked = false;
+      let reviewErrorMessage = "";
+
+      const reviewRes = await fetch(buildApiUrl(API_ENDPOINTS.novelReviews(readNovelId)), {
+        method: "POST",
+        headers: buildRequestHeaders(
+          { Accept: "application/json", "Content-Type": "application/json" },
+          { includeUserId: true },
+        ),
+        body: JSON.stringify({
+          review_text: trimmedComment,
+          content: trimmedComment,
+        }),
+      });
+      const reviewPayload = await tryParseJson(reviewRes);
+
+      if (reviewRes.ok) {
+        postPayload = reviewPayload;
+        postWorked = true;
+      } else {
+        reviewErrorMessage = reviewPayload?.message || reviewPayload?.error || "";
+      }
+
+      if (!postWorked) {
+        const commentsRes = await fetch(buildApiUrl(API_ENDPOINTS.comments), {
           method: "POST",
           headers: buildRequestHeaders(
             { Accept: "application/json", "Content-Type": "application/json" },
             { includeUserId: true },
           ),
-          body: JSON.stringify({ content: trimmedComment }),
-        },
-      );
+          body: JSON.stringify({
+            novel_id: readNovelId,
+            review_text: trimmedComment,
+            content: trimmedComment,
+          }),
+        });
+        const commentsPayload = await tryParseJson(commentsRes);
 
-      const postData = await tryParseJson(postResponse);
-      if (!postResponse.ok) {
-        throw new Error(postData?.message || "Failed to post comment. Please login first.");
+        if (commentsRes.ok) {
+          postPayload = commentsPayload;
+          postWorked = true;
+        } else if (!activeRouteTitle) {
+          throw new Error(
+            commentsPayload?.message ||
+              commentsPayload?.error ||
+              reviewErrorMessage ||
+              "Unable to post review right now. Refresh and try again.",
+          );
+        }
+      }
+
+      if (!postWorked) {
+        const fallbackRes = await fetch(
+          buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
+          {
+            method: "POST",
+            headers: buildRequestHeaders(
+              { Accept: "application/json", "Content-Type": "application/json" },
+              { includeUserId: true },
+            ),
+            body: JSON.stringify({
+              content: trimmedComment,
+              review_text: trimmedComment,
+            }),
+          },
+        );
+        const fallbackPayload = await tryParseJson(fallbackRes);
+
+        if (!fallbackRes.ok) {
+          throw new Error(
+            fallbackPayload?.message ||
+              fallbackPayload?.error ||
+              reviewErrorMessage ||
+              "Failed to post comment. Please login first.",
+          );
+        }
+
+        postPayload = fallbackPayload;
       }
 
       setCommentText("");
-      setCommentSuccess(postData?.message || "Comment posted.");
-
-      const refreshResponse = await fetch(
-        buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
-        {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        },
-      );
-
-      const refreshData = await tryParseJson(refreshResponse);
-      if (refreshResponse.ok && refreshData) {
-        setReviews(Array.isArray(refreshData.reviews) ? refreshData.reviews : []);
-      }
+      setCommentSuccess(postPayload?.message || "Comment posted.");
+      await refreshReviews({ routeTitle: activeRouteTitle, fallbackReviews: reviews });
     } catch (submitError) {
-      setCommentError(submitError.message || "Failed to post comment.");
+      setCommentError(
+        getUserFriendlyErrorMessage(
+          submitError,
+          "Unable to post your comment. Please refresh and try again.",
+        ),
+      );
     } finally {
       setCommentLoading(false);
     }
@@ -179,13 +387,17 @@ export default function NovelDetailPage() {
 
   const handleRatingSubmit = async (event) => {
     event.preventDefault();
-    const userId = getCurrentUserId();
 
     setRatingError("");
     setRatingSuccess("");
 
-    if (!userId) {
+    if (!currentUserId) {
       setRatingError("Missing user id. Please log in again.");
+      return;
+    }
+
+    if (hasUserRated) {
+      setRatingError("You already rated this novel. Rating twice is disabled.");
       return;
     }
 
@@ -211,9 +423,22 @@ export default function NovelDetailPage() {
         throw new Error(payload?.message || payload?.error || "Failed to submit rating.");
       }
 
+      setNovelStats((prev) => ({
+        ...(prev || {}),
+        average_rating: payload?.average_rating ?? prev?.average_rating ?? numericRating,
+        ratings_count: payload?.ratings_count ?? prev?.ratings_count ?? 1,
+        current_user_rating: payload?.user_rating ?? numericRating,
+      }));
+      setRatingValue(String(payload?.user_rating ?? numericRating));
       setRatingSuccess(payload?.message || "Rating submitted.");
+      void loadNovelStats();
     } catch (submitError) {
-      setRatingError(submitError.message || "Failed to submit rating.");
+      setRatingError(
+        getUserFriendlyErrorMessage(
+          submitError,
+          "Unable to submit your rating. Please refresh and try again.",
+        ),
+      );
     } finally {
       setRatingLoading(false);
     }
@@ -250,12 +475,15 @@ export default function NovelDetailPage() {
 
       setLoading(true);
       setError("");
+      setStatsError("");
       setChapterError("");
       setCommentError("");
       setCommentSuccess("");
       setRatingError("");
       setRatingSuccess("");
       setCurrentChapter(null);
+      setNovelStats(null);
+      setRatingValue("5");
 
       try {
         let detailsData = null;
@@ -309,10 +537,11 @@ export default function NovelDetailPage() {
               (a, b) => Number(a.chapter_number) - Number(b.chapter_number),
             )
           : [];
+        const defaultReviews = Array.isArray(detailsData.reviews) ? detailsData.reviews : [];
 
         setNovel(detailsData.novel ?? null);
         setChapters(chapterList);
-        setReviews(Array.isArray(detailsData.reviews) ? detailsData.reviews : []);
+        setReviews(defaultReviews);
         setActiveRouteTitle(matchedRouteTitle);
 
         const firstChapter = detailsData.first_chapter ?? chapterList[0] ?? null;
@@ -321,15 +550,27 @@ export default function NovelDetailPage() {
         } else if (firstChapter?.chapter_number !== undefined) {
           await loadChapter(firstChapter.chapter_number, false);
         }
+
+        void loadNovelStats();
+        void trackNovelView();
+        void refreshReviews({
+          routeTitle: matchedRouteTitle,
+          fallbackReviews: defaultReviews,
+        });
       } catch (fetchError) {
-        setError(fetchError.message || "Failed to fetch novel details.");
+        setError(
+          getUserFriendlyErrorMessage(
+            fetchError,
+            "Unable to load novel details. Please refresh and try again.",
+          ),
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchNovelDetails();
-  }, [loadChapter, novelTitle, readNovelId]);
+  }, [loadChapter, loadNovelStats, novelTitle, readNovelId, refreshReviews, trackNovelView]);
 
   const firstChapter = chapters[0] ?? null;
   const lastChapter = chapters[chapters.length - 1] ?? null;
@@ -377,7 +618,12 @@ export default function NovelDetailPage() {
                 <p>
                   <strong>Genre:</strong> {novel?.genre || "General"}
                 </p>
+                <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
+                  <span className="rating-stars">{buildStars(averageRating)}</span>
+                  <span>{averageRating.toFixed(1)} / 5 ({ratingsCount})</span>
+                </p>
                 <p>{getNovelDescription(novel)}</p>
+                {statsError && <p className="status-error">{statsError}</p>}
               </div>
 
               <form className="rating-form" onSubmit={handleRatingSubmit}>
@@ -387,7 +633,7 @@ export default function NovelDetailPage() {
                     id="novel-rating-select"
                     value={ratingValue}
                     onChange={(event) => setRatingValue(event.target.value)}
-                    disabled={ratingLoading}
+                    disabled={ratingLoading || hasUserRated}
                   >
                     <option value="5">5 - Excellent</option>
                     <option value="4">4 - Good</option>
@@ -398,11 +644,20 @@ export default function NovelDetailPage() {
                   <button
                     type="submit"
                     className="logout-btn compact-btn"
-                    disabled={ratingLoading}
+                    disabled={ratingLoading || hasUserRated}
                   >
-                    {ratingLoading ? "Submitting..." : "Submit Rating"}
+                    {hasUserRated
+                      ? "Rating Locked"
+                      : ratingLoading
+                        ? "Submitting..."
+                        : "Submit Rating"}
                   </button>
                 </div>
+                {hasUserRated && (
+                  <p className="status-success">
+                    You already rated this novel {Number(novelStats?.current_user_rating)} / 5.
+                  </p>
+                )}
                 {ratingError && <p className="status-error">{ratingError}</p>}
                 {ratingSuccess && <p className="status-success">{ratingSuccess}</p>}
               </form>
@@ -481,16 +736,13 @@ export default function NovelDetailPage() {
                   </div>
 
                   <div className="novel-comments">
-                    <h3>Comments</h3>
+                    <h3>Reviews & Comments</h3>
                     {reviews.length === 0 ? (
                       <p>No comments yet. Be the first to add one.</p>
                     ) : (
                       <ul className="comment-list">
                         {reviews.map((review, index) => {
-                          const rawPhoto = review?.profile_photo ?? "";
-                          const profilePhoto = /^https?:\/\//i.test(rawPhoto)
-                            ? rawPhoto
-                            : buildImageUrl(rawPhoto);
+                          const profilePhoto = getProfilePhotoUrl(review?.profile_photo);
 
                           return (
                             <li
@@ -509,7 +761,11 @@ export default function NovelDetailPage() {
                                     {review.username ?? "Anonymous"}
                                   </span>
                                   <span className="comment-date">
-                                    {formatReviewDate(review.publish_time)}
+                                    {formatReviewDate(
+                                      review.publish_time ??
+                                        review.created_at ??
+                                        review.updated_at,
+                                    )}
                                   </span>
                                 </div>
                               </div>
@@ -530,16 +786,23 @@ export default function NovelDetailPage() {
                         onChange={(event) => setCommentText(event.target.value)}
                         placeholder="Write your comment..."
                         rows={4}
-                        disabled={commentLoading}
+                        disabled={commentLoading || !currentUserId}
                       />
                       <div className="comment-form-actions">
                         <button
                           type="submit"
                           className="logout-btn compact-btn"
-                          disabled={commentLoading}
+                          disabled={commentLoading || !currentUserId}
                         >
-                          {commentLoading ? "Posting..." : "Post Comment"}
+                          {!currentUserId
+                            ? "Login Required"
+                            : commentLoading
+                              ? "Posting..."
+                              : "Post Comment"}
                         </button>
+                        {!currentUserId && (
+                          <p className="status-error">Log in to post a comment.</p>
+                        )}
                         {commentError && <p className="status-error">{commentError}</p>}
                         {commentSuccess && <p className="status-success">{commentSuccess}</p>}
                       </div>

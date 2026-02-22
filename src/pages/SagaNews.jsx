@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import Header from "../Header";
-import { API_ENDPOINTS, buildApiUrl, getNovelDescription, getNovelTitle } from "../constants/api";
+import {
+  API_ENDPOINTS,
+  buildApiUrl,
+  getNovelDescription,
+  getNovelTitle,
+  getUserFriendlyErrorMessage,
+} from "../constants/api";
 
 export default function SagaNews() {
   const [novels, setListings] = useState([]);
@@ -22,7 +28,12 @@ export default function SagaNews() {
         const data = await res.json();
         setListings(data);
       } catch (err) {
-        setError(err.message);
+        setError(
+          getUserFriendlyErrorMessage(
+            err,
+            "Unable to load saga updates right now. Please refresh and try again.",
+          ),
+        );
       } finally {
         setLoading(false);
       }
