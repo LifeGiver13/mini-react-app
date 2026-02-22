@@ -98,6 +98,19 @@
   margin-top: 0.65rem;
 }
 
+.card-actions {
+  margin-top: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.card-actions .logout-btn {
+  margin-top: 0;
+}
+
 .novel-detail-layout {
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
@@ -197,6 +210,93 @@
 
 .chapter-bottom-nav .logout-btn {
   min-width: 110px;
+}
+
+.novel-comments {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(139, 90, 43, 0.28);
+}
+
+.novel-comments h3 {
+  margin: 0 0 0.7rem;
+  color: #343a40;
+}
+
+.comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.comment-item {
+  border: 1px solid rgba(52, 58, 64, 0.2);
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: #fff8e8;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.comment-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(139, 90, 43, 0.6);
+}
+
+.comment-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-username {
+  font-weight: 700;
+  color: #2b2f35;
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: rgba(31, 35, 40, 0.7);
+}
+
+.comment-text {
+  margin: 0;
+  color: #1f2328;
+  white-space: pre-wrap;
+}
+
+.comment-form {
+  margin-top: 0.9rem;
+}
+
+.comment-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+  color: #2b2f35;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 105px;
+  resize: vertical;
+}
+
+.comment-form-actions {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 @media (max-width: 1040px) {

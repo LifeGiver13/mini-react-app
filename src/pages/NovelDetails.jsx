@@ -4,6 +4,7 @@ import Header from "../Header";
 import {
   API_ENDPOINTS,
   buildApiUrl,
+  buildImageUrl,
   getNovelAuthor,
   getNovelCover,
   getNovelDescription,
@@ -38,15 +39,34 @@ const tryParseJson = async (response) => {
   return null;
 };
 
+const formatReviewDate = (publishTime) => {
+  if (!publishTime) {
+    return "Unknown date";
+  }
+
+  const parsedDate = new Date(publishTime);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return String(publishTime);
+  }
+
+  return parsedDate.toLocaleString();
+};
+
 export default function NovelDetailPage() {
   const { novelId, novelTitle } = useParams();
   const [novel, setNovel] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [currentChapter, setCurrentChapter] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [activeRouteTitle, setActiveRouteTitle] = useState("");
+  const [commentText, setCommentText] = useState("");
   const [loading, setLoading] = useState(true);
   const [chapterLoading, setChapterLoading] = useState(false);
+  const [commentLoading, setCommentLoading] = useState(false);
   const [error, setError] = useState("");
   const [chapterError, setChapterError] = useState("");
+  const [commentError, setCommentError] = useState("");
+  const [commentSuccess, setCommentSuccess] = useState("");
 
   const readNovelId = Number(novelId);
 
@@ -88,6 +108,63 @@ export default function NovelDetailPage() {
     [readNovelId],
   );
 
+  const handleCommentSubmit = async (event) => {
+    event.preventDefault();
+    const trimmedComment = commentText.trim();
+
+    setCommentError("");
+    setCommentSuccess("");
+
+    if (!trimmedComment) {
+      setCommentError("Comment cannot be empty.");
+      return;
+    }
+
+    if (!activeRouteTitle) {
+      setCommentError("Unable to post comment right now. Refresh and try again.");
+      return;
+    }
+
+    setCommentLoading(true);
+    try {
+      const postResponse = await fetch(
+        buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
+        {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ content: trimmedComment }),
+        },
+      );
+
+      const postData = await tryParseJson(postResponse);
+      if (!postResponse.ok) {
+        throw new Error(postData?.message || "Failed to post comment. Please login first.");
+      }
+
+      setCommentText("");
+      setCommentSuccess(postData?.message || "Comment posted.");
+
+      const refreshResponse = await fetch(
+        buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+          credentials: "include",
+        },
+      );
+
+      const refreshData = await tryParseJson(refreshResponse);
+      if (refreshResponse.ok && refreshData) {
+        setReviews(Array.isArray(refreshData.reviews) ? refreshData.reviews : []);
+      }
+    } catch (submitError) {
+      setCommentError(submitError.message || "Failed to post comment.");
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchNovelDetails = async () => {
       if (!readNovelId || Number.isNaN(readNovelId)) {
@@ -99,6 +176,8 @@ export default function NovelDetailPage() {
       setLoading(true);
       setError("");
       setChapterError("");
+      setCommentError("");
+      setCommentSuccess("");
 
       try {
         const titleCandidates = [];
@@ -129,6 +208,7 @@ export default function NovelDetailPage() {
         }
 
         let detailsData = null;
+        let matchedRouteTitle = "";
         for (const candidate of titleCandidates) {
           const detailsRes = await fetch(
             buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, candidate)),
@@ -142,6 +222,7 @@ export default function NovelDetailPage() {
           const responseData = await tryParseJson(detailsRes);
           if (detailsRes.ok && responseData) {
             detailsData = responseData;
+            matchedRouteTitle = candidate;
             break;
           }
         }
@@ -158,6 +239,8 @@ export default function NovelDetailPage() {
 
         setNovel(detailsData.novel ?? null);
         setChapters(chapterList);
+        setReviews(Array.isArray(detailsData.reviews) ? detailsData.reviews : []);
+        setActiveRouteTitle(matchedRouteTitle);
 
         const firstChapter = detailsData.first_chapter ?? chapterList[0] ?? null;
         if (firstChapter?.chapter_number !== undefined) {
@@ -293,6 +376,72 @@ export default function NovelDetailPage() {
                     >
                       Next
                     </button>
+                  </div>
+
+                  <div className="novel-comments">
+                    <h3>Comments</h3>
+                    {reviews.length === 0 ? (
+                      <p>No comments yet. Be the first to add one.</p>
+                    ) : (
+                      <ul className="comment-list">
+                        {reviews.map((review, index) => {
+                          const rawPhoto = review?.profile_photo ?? "";
+                          const profilePhoto = /^https?:\/\//i.test(rawPhoto)
+                            ? rawPhoto
+                            : buildImageUrl(rawPhoto);
+
+                          return (
+                            <li
+                              key={review.review_id ?? `${review.username ?? "user"}-${index}`}
+                              className="comment-item"
+                            >
+                              <div className="comment-header">
+                                <img
+                                  src={profilePhoto || "/vite.svg"}
+                                  alt={`${review.username ?? "User"} profile`}
+                                  className="comment-avatar"
+                                  loading="lazy"
+                                />
+                                <div className="comment-meta">
+                                  <span className="comment-username">
+                                    {review.username ?? "Anonymous"}
+                                  </span>
+                                  <span className="comment-date">
+                                    {formatReviewDate(review.publish_time)}
+                                  </span>
+                                </div>
+                              </div>
+                              <p className="comment-text">
+                                {review.review_text ?? review.content ?? ""}
+                              </p>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+
+                    <form className="comment-form" onSubmit={handleCommentSubmit}>
+                      <label htmlFor="novel-comment-input">Add a comment</label>
+                      <textarea
+                        id="novel-comment-input"
+                        value={commentText}
+                        onChange={(event) => setCommentText(event.target.value)}
+                        placeholder="Write your comment..."
+                        rows={4}
+                        disabled={commentLoading}
+                      />
+                      <div className="comment-form-actions">
+                        <button
+                          type="submit"
+                          className="logout-btn compact-btn"
+                          disabled={commentLoading}
+                        >
+                          {commentLoading ? "Posting..." : "Post Comment"}
+                        </button>
+                        {commentError && <p className="status-error">{commentError}</p>}
+                        {commentSuccess && <p className="status-success">{commentSuccess}</p>}
+                      </div>
+                    </form>
                   </div>
                 </>
               )}
