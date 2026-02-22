@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../Header";
-import { API_ENDPOINTS, buildApiUrl } from "../constants/api";
+import {
+  API_ENDPOINTS,
+  buildApiUrl,
+  getUserFriendlyErrorMessage,
+} from "../constants/api";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -84,7 +88,12 @@ export default function Register() {
         navigate("/login");
       }, 1200);
     } catch (err) {
-      setError(err.message);
+      setError(
+        getUserFriendlyErrorMessage(
+          err,
+          "Unable to register right now. Please check your connection and refresh.",
+        ),
+      );
     } finally {
       setLoading(false);
     }

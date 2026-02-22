@@ -56,6 +56,21 @@
   color: #f5deb3;
 }
 
+.rating-summary {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-weight: 700;
+}
+
+.rating-stars {
+  color: #f5c451;
+  letter-spacing: 0.02em;
+}
+
 #myDIV img {
   width: min(100%, 290px);
   aspect-ratio: 3 / 4;

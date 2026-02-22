@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Header";
-import { API_ENDPOINTS, buildApiUrl, buildImageUrl } from "../constants/api";
+import {
+  API_ENDPOINTS,
+  buildApiUrl,
+  getProfilePhotoUrl,
+  getUserFriendlyErrorMessage,
+} from "../constants/api";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -31,7 +36,12 @@ export default function Users() {
 
         setUsers(filteredUsers);
       } catch (fetchError) {
-        setError(fetchError.message);
+        setError(
+          getUserFriendlyErrorMessage(
+            fetchError,
+            "Unable to load users right now. Please refresh and try again.",
+          ),
+        );
       } finally {
         setLoading(false);
       }
@@ -57,7 +67,7 @@ export default function Users() {
                 <div className="flex-cont">
                   <div>
                     <img
-                      src={buildImageUrl(user.profile_photo)}
+                      src={getProfilePhotoUrl(user.profile_photo) || "/vite.svg"}
                       alt={`${user.username} profile`}
                       className="profile-avatar"
                       loading="lazy"

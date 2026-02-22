@@ -12,6 +12,8 @@ import {
   getNovelId,
   getNovelSlug,
   getNovelTitle,
+  getUserFriendlyErrorMessage,
+  normalizeAverageRating,
 } from "../constants/api";
 
 const parseResponseJson = async (response) => {
@@ -22,8 +24,14 @@ const parseResponseJson = async (response) => {
   }
 };
 
+const buildStars = (averageRating) => {
+  const rounded = Math.round(normalizeAverageRating(averageRating, 3));
+  return `${"\u2605".repeat(rounded)}${"\u2606".repeat(5 - rounded)}`;
+};
+
 export default function Listings() {
   const [listings, setListings] = useState([]);
+  const [statsByNovelId, setStatsByNovelId] = useState({});
   const [savedNovelIds, setSavedNovelIds] = useState(new Set());
   const [savingNovelIds, setSavingNovelIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
@@ -59,7 +67,45 @@ export default function Listings() {
 
         const novelsData = await novelsRes.json();
         setListings(novelsData);
+        setStatsByNovelId({});
         setLoading(false);
+
+        const novelIds = (Array.isArray(novelsData) ? novelsData : [])
+          .map((novel) => Number(getNovelId(novel)))
+          .filter((id) => !Number.isNaN(id));
+
+        Promise.all(
+          novelIds.map(async (id) => {
+            try {
+              const statsRes = await fetch(buildApiUrl(API_ENDPOINTS.novelStats(id)), {
+                method: "GET",
+                headers: buildRequestHeaders(
+                  { Accept: "application/json" },
+                  { includeUserId: true },
+                ),
+              });
+
+              if (!statsRes.ok) {
+                return [id, null];
+              }
+
+              const statsPayload = await parseResponseJson(statsRes);
+              return [id, statsPayload];
+            } catch {
+              return [id, null];
+            }
+          }),
+        ).then((entries) => {
+          setStatsByNovelId((prev) => {
+            const next = { ...prev };
+            entries.forEach(([id, payload]) => {
+              if (payload) {
+                next[id] = payload;
+              }
+            });
+            return next;
+          });
+        });
 
         if (!userId) {
           return;
@@ -82,7 +128,12 @@ export default function Listings() {
             // Saved-state bootstrap should not block listings render.
           });
       } catch (err) {
-        setError(err.message);
+        setError(
+          getUserFriendlyErrorMessage(
+            err,
+            "Unable to load listings. Please refresh and try again.",
+          ),
+        );
       } finally {
         setLoading(false);
       }
@@ -147,7 +198,12 @@ export default function Listings() {
         payload?.message || (isCurrentlySaved ? "Removed from book list." : "Saved to book list."),
       );
     } catch (toggleError) {
-      setSaveError(toggleError.message || "Failed to update book list.");
+      setSaveError(
+        getUserFriendlyErrorMessage(
+          toggleError,
+          "Unable to update your book list. Please refresh and try again.",
+        ),
+      );
     } finally {
       setSavingNovelIds((prev) => {
         const next = new Set(prev);
@@ -179,6 +235,9 @@ export default function Listings() {
               const novelTitle = getNovelTitle(novel);
               const isSaved = savedNovelIds.has(Number(novelId));
               const isSaving = savingNovelIds.has(Number(novelId));
+              const stats = statsByNovelId[Number(novelId)] ?? null;
+              const averageRating = normalizeAverageRating(stats?.average_rating, 3);
+              const ratingCount = Number(stats?.ratings_count ?? 0);
 
               return (
                 <li key={novelId ?? novelTitle} id="myDIV">
@@ -187,6 +246,10 @@ export default function Listings() {
                     <div>
                       <h3>{novelTitle}</h3>
                       <h4>Author: {getNovelAuthor(novel)}</h4>
+                      <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
+                        <span className="rating-stars">{buildStars(averageRating)}</span>
+                        <span>{averageRating.toFixed(1)} / 5 ({ratingCount})</span>
+                      </p>
                       <p>{getNovelDescription(novel)}</p>
                       <div className="card-actions">
                         <button
