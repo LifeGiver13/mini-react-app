@@ -73,8 +73,8 @@ export default function Users() {
                       loading="lazy"
                     />
                     <h3 className="user-name">{user.username}</h3>
-                    <Link to={`/users/${user.user_id}`} className="details-link">
-                      View Details
+                    <Link to="/trend" className="details-link">
+                      View Trending
                     </Link>
                   </div>
                 </div>
