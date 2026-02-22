@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../Header";
 import {
@@ -41,6 +41,27 @@ export default function Listings() {
   const navigate = useNavigate();
 
   const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+
+  const sortedListings = useMemo(() => {
+    return [...listings].sort((novelA, novelB) => {
+      const novelAId = Number(getNovelId(novelA));
+      const novelBId = Number(getNovelId(novelB));
+      const novelAUniqueViews = Number(statsByNovelId[novelAId]?.unique_viewers ?? 0);
+      const novelBUniqueViews = Number(statsByNovelId[novelBId]?.unique_viewers ?? 0);
+      const novelAViews = Number(statsByNovelId[novelAId]?.view_count ?? 0);
+      const novelBViews = Number(statsByNovelId[novelBId]?.view_count ?? 0);
+
+      if (novelAUniqueViews !== novelBUniqueViews) {
+        return novelBUniqueViews - novelAUniqueViews;
+      }
+
+      if (novelAViews !== novelBViews) {
+        return novelBViews - novelAViews;
+      }
+
+      return getNovelTitle(novelA).localeCompare(getNovelTitle(novelB));
+    });
+  }, [listings, statsByNovelId]);
 
   const handleDetailsRedirect = (novelId, novelTitle) => {
     const novelSlug = getNovelSlug(novelTitle);
@@ -222,7 +243,7 @@ export default function Listings() {
         <p>Loading...</p>
       ) : error ? (
         <p className="status-error">{error}</p>
-      ) : listings.length === 0 ? (
+      ) : sortedListings.length === 0 ? (
         <p>No listings found.</p>
       ) : (
         <div className="container themed-panel bg-man">
@@ -230,7 +251,7 @@ export default function Listings() {
           {saveError && <p className="status-error">{saveError}</p>}
           {saveSuccess && <p className="status-success">{saveSuccess}</p>}
           <ul className="list">
-            {listings.map((novel) => {
+            {sortedListings.map((novel) => {
               const novelId = getNovelId(novel);
               const novelTitle = getNovelTitle(novel);
               const isSaved = savedNovelIds.has(Number(novelId));
@@ -238,6 +259,8 @@ export default function Listings() {
               const stats = statsByNovelId[Number(novelId)] ?? null;
               const averageRating = normalizeAverageRating(stats?.average_rating, 3);
               const ratingCount = Number(stats?.ratings_count ?? 0);
+              const viewCount = Number(stats?.view_count ?? 0);
+              const uniqueViews = Number(stats?.unique_viewers ?? 0);
 
               return (
                 <li key={novelId ?? novelTitle} id="myDIV">
@@ -249,6 +272,8 @@ export default function Listings() {
                       <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
                         <span className="rating-stars">{buildStars(averageRating)}</span>
                         <span>{averageRating.toFixed(1)} / 5 ({ratingCount})</span>
+                        <span>Unique Views: {uniqueViews}</span>
+                        <span>Total Opens: {viewCount}</span>
                       </p>
                       <p>{getNovelDescription(novel)}</p>
                       <div className="card-actions">

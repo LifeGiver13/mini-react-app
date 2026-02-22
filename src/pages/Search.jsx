@@ -274,6 +274,8 @@ export default function Search() {
               const stats = statsByNovelId[Number(novelId)] ?? null;
               const averageRating = normalizeAverageRating(stats?.average_rating, 3);
               const ratingCount = Number(stats?.ratings_count ?? 0);
+              const viewCount = Number(stats?.view_count ?? 0);
+              const uniqueViews = Number(stats?.unique_viewers ?? 0);
 
               return (
                 <li key={novelId ?? novelTitle} className="saying-item">
@@ -283,6 +285,8 @@ export default function Search() {
                   <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
                     <span className="rating-stars">{buildStars(averageRating)}</span>
                     <span>{averageRating.toFixed(1)} / 5 ({ratingCount})</span>
+                    <span>Unique Views: {uniqueViews}</span>
+                    <span>Total Opens: {viewCount}</span>
                   </p>
                   <span>{getNovelDescription(novel)}</span>
                   <div className="card-actions">
