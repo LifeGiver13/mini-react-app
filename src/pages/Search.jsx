@@ -5,6 +5,8 @@ import Header from "../Header";
 import {
   API_ENDPOINTS,
   buildApiUrl,
+  buildRequestHeaders,
+  getCurrentUserId,
   getNovelAuthor,
   getNovelCover,
   getNovelDescription,
@@ -49,7 +51,6 @@ export default function Search() {
       try {
         const response = await fetch(buildApiUrl(API_ENDPOINTS.myBooklist(userId)), {
           method: "GET",
-          credentials: "include",
         });
         if (!response.ok) {
           return;
@@ -85,7 +86,7 @@ export default function Search() {
 
     try {
       const res = await fetch(buildApiUrl(API_ENDPOINTS.search(value)), {
-        credentials: "include",
+        method: "GET",
       });
 
       if (!res.ok) {
@@ -119,19 +120,32 @@ export default function Search() {
     const endpoint = isCurrentlySaved
       ? API_ENDPOINTS.unsaveNovel(numericNovelId)
       : API_ENDPOINTS.saveNovel(numericNovelId);
+    const userId = getCurrentUserId();
+
+    if (!userId) {
+      setSaveError("Missing user id. Please log in again.");
+      return;
+    }
 
     setSavingNovelIds((prev) => new Set(prev).add(numericNovelId));
 
     try {
       const response = await fetch(buildApiUrl(endpoint), {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        credentials: "include",
+        headers: buildRequestHeaders(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          { includeUserId: true },
+        ),
         body: JSON.stringify({}),
       });
       const payload = await parseResponseJson(response);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Authentication required. Please log in again to sync your book list.",
+          );
+        }
         throw new Error(payload?.message || "Failed to update book list.");
       }
 

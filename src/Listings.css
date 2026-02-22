@@ -141,6 +141,37 @@
   border-radius: 12px;
 }
 
+.rating-form {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(139, 90, 43, 0.25);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.rating-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+  color: #2b2f35;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.rating-row select {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid rgba(52, 58, 64, 0.3);
+  border-radius: 10px;
+  background: #fff;
+}
+
 .chapter-controls {
   display: flex;
   gap: 0.55rem;

@@ -5,6 +5,8 @@ import {
   API_ENDPOINTS,
   buildApiUrl,
   buildImageUrl,
+  buildRequestHeaders,
+  getCurrentUserId,
   getNovelAuthor,
   getNovelCover,
   getNovelDescription,
@@ -63,10 +65,14 @@ export default function NovelDetailPage() {
   const [loading, setLoading] = useState(true);
   const [chapterLoading, setChapterLoading] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);
+  const [ratingValue, setRatingValue] = useState("5");
+  const [ratingLoading, setRatingLoading] = useState(false);
   const [error, setError] = useState("");
   const [chapterError, setChapterError] = useState("");
   const [commentError, setCommentError] = useState("");
   const [commentSuccess, setCommentSuccess] = useState("");
+  const [ratingError, setRatingError] = useState("");
+  const [ratingSuccess, setRatingSuccess] = useState("");
 
   const readNovelId = Number(novelId);
 
@@ -87,7 +93,6 @@ export default function NovelDetailPage() {
           {
             method: "GET",
             headers: { Accept: "application/json" },
-            credentials: "include",
           },
         );
 
@@ -111,6 +116,7 @@ export default function NovelDetailPage() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
     const trimmedComment = commentText.trim();
+    const userId = getCurrentUserId();
 
     setCommentError("");
     setCommentSuccess("");
@@ -125,14 +131,21 @@ export default function NovelDetailPage() {
       return;
     }
 
+    if (!userId) {
+      setCommentError("Missing user id. Please log in again.");
+      return;
+    }
+
     setCommentLoading(true);
     try {
       const postResponse = await fetch(
         buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, activeRouteTitle)),
         {
           method: "POST",
-          headers: { Accept: "application/json", "Content-Type": "application/json" },
-          credentials: "include",
+          headers: buildRequestHeaders(
+            { Accept: "application/json", "Content-Type": "application/json" },
+            { includeUserId: true },
+          ),
           body: JSON.stringify({ content: trimmedComment }),
         },
       );
@@ -150,7 +163,6 @@ export default function NovelDetailPage() {
         {
           method: "GET",
           headers: { Accept: "application/json" },
-          credentials: "include",
         },
       );
 
@@ -165,7 +177,70 @@ export default function NovelDetailPage() {
     }
   };
 
+  const handleRatingSubmit = async (event) => {
+    event.preventDefault();
+    const userId = getCurrentUserId();
+
+    setRatingError("");
+    setRatingSuccess("");
+
+    if (!userId) {
+      setRatingError("Missing user id. Please log in again.");
+      return;
+    }
+
+    const numericRating = Number(ratingValue);
+    if (Number.isNaN(numericRating) || numericRating < 1 || numericRating > 5) {
+      setRatingError("Please select a rating between 1 and 5.");
+      return;
+    }
+
+    setRatingLoading(true);
+    try {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.rateNovel(readNovelId)), {
+        method: "POST",
+        headers: buildRequestHeaders(
+          { Accept: "application/json", "Content-Type": "application/json" },
+          { includeUserId: true },
+        ),
+        body: JSON.stringify({ rating: numericRating }),
+      });
+      const payload = await tryParseJson(response);
+
+      if (!response.ok) {
+        throw new Error(payload?.message || payload?.error || "Failed to submit rating.");
+      }
+
+      setRatingSuccess(payload?.message || "Rating submitted.");
+    } catch (submitError) {
+      setRatingError(submitError.message || "Failed to submit rating.");
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
   useEffect(() => {
+    const fetchDetailsByTitle = async (titleCandidate) => {
+      if (!titleCandidate) {
+        return null;
+      }
+
+      const response = await fetch(
+        buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, titleCandidate)),
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        },
+      );
+
+      const responseData = await tryParseJson(response);
+      if (!response.ok || !responseData) {
+        return null;
+      }
+
+      return { data: responseData, matchedTitle: titleCandidate };
+    };
+
     const fetchNovelDetails = async () => {
       if (!readNovelId || Number.isNaN(readNovelId)) {
         setError("Invalid novel id.");
@@ -178,52 +253,50 @@ export default function NovelDetailPage() {
       setChapterError("");
       setCommentError("");
       setCommentSuccess("");
+      setRatingError("");
+      setRatingSuccess("");
+      setCurrentChapter(null);
 
       try {
-        const titleCandidates = [];
-        if (novelTitle) {
-          titleCandidates.push(decodeURIComponent(novelTitle));
-        }
-
-        const novelsRes = await fetch(buildApiUrl(API_ENDPOINTS.novels), {
-          method: "GET",
-          headers: { Accept: "application/json" },
-          credentials: "include",
-        });
-        const novelsData = await tryParseJson(novelsRes);
-        const selectedNovel = Array.isArray(novelsData)
-          ? novelsData.find((item) => Number(getNovelId(item)) === readNovelId)
-          : null;
-
-        const selectedNovelTitle = selectedNovel ? getNovelTitle(selectedNovel) : "";
-        if (selectedNovelTitle && !titleCandidates.includes(selectedNovelTitle)) {
-          titleCandidates.push(selectedNovelTitle);
-        }
-        const selectedNovelSlug = getNovelSlug(selectedNovelTitle);
-        if (selectedNovelSlug && !titleCandidates.includes(selectedNovelSlug)) {
-          titleCandidates.push(selectedNovelSlug);
-        }
-        if (titleCandidates.length === 0) {
-          titleCandidates.push("novel");
-        }
-
         let detailsData = null;
         let matchedRouteTitle = "";
-        for (const candidate of titleCandidates) {
-          const detailsRes = await fetch(
-            buildApiUrl(API_ENDPOINTS.novelDetails(readNovelId, candidate)),
-            {
-              method: "GET",
-              headers: { Accept: "application/json" },
-              credentials: "include",
-            },
-          );
 
-          const responseData = await tryParseJson(detailsRes);
-          if (detailsRes.ok && responseData) {
-            detailsData = responseData;
-            matchedRouteTitle = candidate;
-            break;
+        const primaryTitle = novelTitle ? decodeURIComponent(novelTitle) : "";
+        const primaryResult = await fetchDetailsByTitle(primaryTitle);
+        if (primaryResult) {
+          detailsData = primaryResult.data;
+          matchedRouteTitle = primaryResult.matchedTitle;
+        } else {
+          const novelsRes = await fetch(buildApiUrl(API_ENDPOINTS.novels), {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          });
+          const novelsData = await tryParseJson(novelsRes);
+          const selectedNovel = Array.isArray(novelsData)
+            ? novelsData.find((item) => Number(getNovelId(item)) === readNovelId)
+            : null;
+
+          const fallbackCandidates = [];
+          const selectedNovelTitle = selectedNovel ? getNovelTitle(selectedNovel) : "";
+          if (selectedNovelTitle && selectedNovelTitle !== primaryTitle) {
+            fallbackCandidates.push(selectedNovelTitle);
+          }
+          const selectedNovelSlug = getNovelSlug(selectedNovelTitle);
+          if (
+            selectedNovelSlug &&
+            selectedNovelSlug !== primaryTitle &&
+            !fallbackCandidates.includes(selectedNovelSlug)
+          ) {
+            fallbackCandidates.push(selectedNovelSlug);
+          }
+
+          for (const candidate of fallbackCandidates) {
+            const fallbackResult = await fetchDetailsByTitle(candidate);
+            if (fallbackResult) {
+              detailsData = fallbackResult.data;
+              matchedRouteTitle = fallbackResult.matchedTitle;
+              break;
+            }
           }
         }
 
@@ -243,7 +316,9 @@ export default function NovelDetailPage() {
         setActiveRouteTitle(matchedRouteTitle);
 
         const firstChapter = detailsData.first_chapter ?? chapterList[0] ?? null;
-        if (firstChapter?.chapter_number !== undefined) {
+        if (firstChapter?.chapter_id !== undefined || firstChapter?.content) {
+          setCurrentChapter(firstChapter);
+        } else if (firstChapter?.chapter_number !== undefined) {
           await loadChapter(firstChapter.chapter_number, false);
         }
       } catch (fetchError) {
@@ -304,6 +379,33 @@ export default function NovelDetailPage() {
                 </p>
                 <p>{getNovelDescription(novel)}</p>
               </div>
+
+              <form className="rating-form" onSubmit={handleRatingSubmit}>
+                <label htmlFor="novel-rating-select">Rate this novel</label>
+                <div className="rating-row">
+                  <select
+                    id="novel-rating-select"
+                    value={ratingValue}
+                    onChange={(event) => setRatingValue(event.target.value)}
+                    disabled={ratingLoading}
+                  >
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Average</option>
+                    <option value="2">2 - Poor</option>
+                    <option value="1">1 - Very Poor</option>
+                  </select>
+                  <button
+                    type="submit"
+                    className="logout-btn compact-btn"
+                    disabled={ratingLoading}
+                  >
+                    {ratingLoading ? "Submitting..." : "Submit Rating"}
+                  </button>
+                </div>
+                {ratingError && <p className="status-error">{ratingError}</p>}
+                {ratingSuccess && <p className="status-success">{ratingSuccess}</p>}
+              </form>
 
               <div className="chapter-controls">
                 <button
