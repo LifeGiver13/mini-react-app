@@ -175,6 +175,20 @@ export default function NovelDetailPage() {
 
   const firstChapter = chapters[0] ?? null;
   const lastChapter = chapters[chapters.length - 1] ?? null;
+  const currentChapterIndex = useMemo(
+    () =>
+      chapters.findIndex(
+        (chapter) =>
+          Number(chapter.chapter_number) === Number(currentChapter?.chapter_number),
+      ),
+    [chapters, currentChapter?.chapter_number],
+  );
+  const previousChapter =
+    currentChapterIndex > 0 ? chapters[currentChapterIndex - 1] : null;
+  const nextChapter =
+    currentChapterIndex >= 0 && currentChapterIndex < chapters.length - 1
+      ? chapters[currentChapterIndex + 1]
+      : null;
   const currentChapterParagraphs = useMemo(
     () => splitChapterContent(currentChapter?.content),
     [currentChapter],
@@ -261,6 +275,24 @@ export default function NovelDetailPage() {
                     {currentChapterParagraphs.map((paragraph, index) => (
                       <p key={`${currentChapter.chapter_id}-${index}`}>{paragraph}</p>
                     ))}
+                  </div>
+                  <div className="chapter-bottom-nav">
+                    <button
+                      type="button"
+                      className="logout-btn compact-btn"
+                      disabled={!previousChapter || chapterLoading}
+                      onClick={() => loadChapter(previousChapter.chapter_number)}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      className="logout-btn compact-btn"
+                      disabled={!nextChapter || chapterLoading}
+                      onClick={() => loadChapter(nextChapter.chapter_number)}
+                    >
+                      Next
+                    </button>
                   </div>
                 </>
               )}

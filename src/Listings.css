@@ -186,6 +186,19 @@
   text-align: left;
 }
 
+.chapter-bottom-nav {
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(139, 90, 43, 0.28);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.chapter-bottom-nav .logout-btn {
+  min-width: 110px;
+}
+
 @media (max-width: 1040px) {
   .novel-detail-layout {
     grid-template-columns: 1fr;
@@ -197,5 +210,10 @@
 
   .chapter-reader {
     min-height: 420px;
+  }
+
+  .chapter-bottom-nav {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }

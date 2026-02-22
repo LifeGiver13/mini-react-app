@@ -41,6 +41,27 @@ export default function Header({ children }) {
     setIsLoggedIn(loggedInFlag || Boolean(user));
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMenuOpen]);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("loggedIn");
@@ -62,10 +83,19 @@ export default function Header({ children }) {
           className="hamburger"
           aria-expanded={isMenuOpen}
           aria-controls="main-navigation"
+          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           onClick={() => setIsMenuOpen((prev) => !prev)}
         >
-          {isMenuOpen ? "×" : "☰"}
+          {isMenuOpen ? "X" : "\u2630"}
         </button>
+
+        <button
+          type="button"
+          className={`nav-overlay ${isMenuOpen ? "open" : ""}`}
+          aria-hidden={!isMenuOpen}
+          tabIndex={isMenuOpen ? 0 : -1}
+          onClick={() => setIsMenuOpen(false)}
+        />
 
         <div id="main-navigation" className={`nav-container ${isMenuOpen ? "open" : ""}`}>
           <ul className="nav-links">
