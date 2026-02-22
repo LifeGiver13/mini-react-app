@@ -8,7 +8,7 @@ export default function Footer() {
           <Link to="/about">Policies</Link>
         </li>
         <li>
-          <Link to="/users">Users</Link>
+          <Link to="/sagaNews">Saga News</Link>
         </li>
         <li>
           <Link to="/trend">Listings</Link>

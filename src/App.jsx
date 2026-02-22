@@ -10,6 +10,7 @@ import SagaNews from './pages/SagaNews';
 import BookList from './pages/BookList';
 import Search from './pages/Search';
 import NovelDetailPage from './pages/NovelDetails';
+import Quotes from './pages/Quotes';
 import Header from './Header';
 import "./App.css";
 
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/bookList" element={<BookList />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/quotes" element={<Quotes />} />
         <Route path="/novel/:novelId" element={<NovelDetailPage />} />
         <Route path="/novel/:novelId/:novelTitle" element={<NovelDetailPage />} />
         <Route

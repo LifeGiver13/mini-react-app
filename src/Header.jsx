@@ -146,8 +146,6 @@ export default function Header({ children }) {
     navigate("/login");
   };
 
-  const fallbackUserId = String(localStorage.getItem("userId") ?? "").trim();
-  const profileUserId = profile?.user_id ?? fallbackUserId;
   const profileName = String(
     profile?.username ?? localStorage.getItem("username") ?? "My Account",
   ).trim();
@@ -183,10 +181,7 @@ export default function Header({ children }) {
           <ul className="nav-links">
             {isLoggedIn && (
               <li className="mobile-profile-row">
-                <Link
-                  to={profileUserId ? `/users/${profileUserId}` : "/users"}
-                  className="mobile-profile-link"
-                >
+                <Link to="/trend" className="mobile-profile-link">
                   <img
                     src={profilePhoto}
                     alt={`${profileName || "User"} profile`}
@@ -239,10 +234,7 @@ export default function Header({ children }) {
         </div>
 
         {isLoggedIn && (
-          <Link
-            to={profileUserId ? `/users/${profileUserId}` : "/users"}
-            className="desktop-profile-link"
-          >
+          <Link to="/trend" className="desktop-profile-link">
             <img
               src={profilePhoto}
               alt={`${profileName || "User"} profile`}
