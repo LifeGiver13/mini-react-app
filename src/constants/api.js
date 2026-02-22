@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
   register: "/register",
   users: "/api/users",
   userDetails: (userId) => `/api/users/${encodeURIComponent(userId)}`,
+  profilePhoto: "/api/profile/photo",
   saveNovel: (novelId) => `/api/save_novel/${encodeURIComponent(novelId)}`,
   unsaveNovel: (novelId) => `/api/unsave_novel/${encodeURIComponent(novelId)}`,
   chapter: (novelId, chapterNumber) =>
@@ -37,6 +38,30 @@ export const API_ENDPOINTS = {
 };
 
 export const buildApiUrl = (endpoint) => `${API_BASE_URL}${endpoint}`;
+
+export const getCurrentUserId = () => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return String(localStorage.getItem("userId") ?? "").trim();
+};
+
+export const buildRequestHeaders = (
+  baseHeaders = {},
+  { includeUserId = false } = {},
+) => {
+  const headers = { ...baseHeaders };
+
+  if (includeUserId) {
+    const userId = getCurrentUserId();
+    if (userId) {
+      headers["X-User-Id"] = userId;
+    }
+  }
+
+  return headers;
+};
 
 export const buildImageUrl = (imageName) =>
   imageName ? buildApiUrl(API_ENDPOINTS.image(imageName)) : "";

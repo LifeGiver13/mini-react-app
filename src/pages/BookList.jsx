@@ -4,6 +4,8 @@ import Header from "../Header";
 import {
   API_ENDPOINTS,
   buildApiUrl,
+  buildRequestHeaders,
+  getCurrentUserId,
   getNovelAuthor,
   getNovelCover,
   getNovelId,
@@ -43,18 +45,31 @@ export default function BookList() {
     setSaveError("");
     setSaveSuccess("");
     const numericNovelId = Number(novelId);
+    const userId = getCurrentUserId();
+    if (!userId) {
+      setSaveError("Missing user id. Please log in again.");
+      return;
+    }
+
     setSavingNovelIds((prev) => new Set(prev).add(numericNovelId));
 
     try {
       const response = await fetch(buildApiUrl(API_ENDPOINTS.unsaveNovel(numericNovelId)), {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        credentials: "include",
+        headers: buildRequestHeaders(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          { includeUserId: true },
+        ),
         body: JSON.stringify({}),
       });
       const payload = await parseResponseJson(response);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Authentication required. Please log in again to sync your book list.",
+          );
+        }
         throw new Error(payload?.message || "Failed to remove from book list.");
       }
 
@@ -84,7 +99,7 @@ export default function BookList() {
 
       try {
         const res = await fetch(buildApiUrl(API_ENDPOINTS.myBooklist(userId)), {
-          credentials: "include",
+          method: "GET",
         });
 
         if (!res.ok) {

@@ -4,6 +4,8 @@ import Header from "../Header";
 import {
   API_ENDPOINTS,
   buildApiUrl,
+  buildRequestHeaders,
+  getCurrentUserId,
   getNovelAuthor,
   getNovelCover,
   getNovelDescription,
@@ -47,18 +49,9 @@ export default function Listings() {
     const fetchListings = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        const [novelsRes, savedRes] = await Promise.all([
-          fetch(buildApiUrl(API_ENDPOINTS.novels), {
-            method: "GET",
-            credentials: "include",
-          }),
-          userId
-            ? fetch(buildApiUrl(API_ENDPOINTS.myBooklist(userId)), {
-                method: "GET",
-                credentials: "include",
-              })
-            : Promise.resolve(null),
-        ]);
+        const novelsRes = await fetch(buildApiUrl(API_ENDPOINTS.novels), {
+          method: "GET",
+        });
 
         if (!novelsRes.ok) {
           throw new Error("Failed to fetch listings");
@@ -66,16 +59,28 @@ export default function Listings() {
 
         const novelsData = await novelsRes.json();
         setListings(novelsData);
+        setLoading(false);
 
-        if (savedRes?.ok) {
-          const savedData = await savedRes.json();
-          const savedIds = new Set(
-            (savedData?.novels || [])
-              .map((novel) => Number(getNovelId(novel)))
-              .filter((id) => !Number.isNaN(id)),
-          );
-          setSavedNovelIds(savedIds);
+        if (!userId) {
+          return;
         }
+
+        fetch(buildApiUrl(API_ENDPOINTS.myBooklist(userId)), { method: "GET" })
+          .then(async (savedRes) => {
+            if (!savedRes.ok) {
+              return;
+            }
+            const savedData = await savedRes.json();
+            const savedIds = new Set(
+              (savedData?.novels || [])
+                .map((novel) => Number(getNovelId(novel)))
+                .filter((id) => !Number.isNaN(id)),
+            );
+            setSavedNovelIds(savedIds);
+          })
+          .catch(() => {
+            // Saved-state bootstrap should not block listings render.
+          });
       } catch (err) {
         setError(err.message);
       } finally {
@@ -99,19 +104,32 @@ export default function Listings() {
     const endpoint = isCurrentlySaved
       ? API_ENDPOINTS.unsaveNovel(numericNovelId)
       : API_ENDPOINTS.saveNovel(numericNovelId);
+    const userId = getCurrentUserId();
+
+    if (!userId) {
+      setSaveError("Missing user id. Please log in again.");
+      return;
+    }
 
     setSavingNovelIds((prev) => new Set(prev).add(numericNovelId));
 
     try {
       const response = await fetch(buildApiUrl(endpoint), {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        credentials: "include",
+        headers: buildRequestHeaders(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          { includeUserId: true },
+        ),
         body: JSON.stringify({}),
       });
       const payload = await parseResponseJson(response);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Authentication required. Please log in again to sync your book list.",
+          );
+        }
         throw new Error(payload?.message || "Failed to update book list.");
       }
 
