@@ -16,8 +16,8 @@ export const API_ENDPOINTS = {
   register: "/register",
   users: "/api/users",
   userDetails: (userId) => `/api/users/${encodeURIComponent(userId)}`,
-  saveNovel: (novelId) => `/save_novel/${encodeURIComponent(novelId)}`,
-  unsaveNovel: (novelId) => `/unsave_novel/${encodeURIComponent(novelId)}`,
+  saveNovel: (novelId) => `/api/save_novel/${encodeURIComponent(novelId)}`,
+  unsaveNovel: (novelId) => `/api/unsave_novel/${encodeURIComponent(novelId)}`,
   chapter: (novelId, chapterNumber) =>
     `/chapter/${encodeURIComponent(novelId)}/${encodeURIComponent(
       chapterNumber,
