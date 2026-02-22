@@ -73,6 +73,30 @@ const buildStars = (averageRating) => {
   return `${"\u2605".repeat(rounded)}${"\u2606".repeat(5 - rounded)}`;
 };
 
+const VIEW_TRACK_TTL_MS = 1000 * 60 * 60 * 12; // 12 hours per user/device and novel
+
+const hasRecentViewTrack = (novelId, userId) => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const scope = userId ? `user-${userId}` : "guest";
+  const key = `novel-view-track:${scope}:${novelId}`;
+  const lastTrackedAt = Number(window.localStorage.getItem(key) || 0);
+
+  return Number.isFinite(lastTrackedAt) && Date.now() - lastTrackedAt < VIEW_TRACK_TTL_MS;
+};
+
+const markViewTracked = (novelId, userId) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const scope = userId ? `user-${userId}` : "guest";
+  const key = `novel-view-track:${scope}:${novelId}`;
+  window.localStorage.setItem(key, String(Date.now()));
+};
+
 export default function NovelDetailPage() {
   const { novelId, novelTitle } = useParams();
   const [novel, setNovel] = useState(null);
@@ -103,6 +127,8 @@ export default function NovelDetailPage() {
     novelStats?.current_user_rating !== undefined;
   const averageRating = normalizeAverageRating(novelStats?.average_rating, 3);
   const ratingsCount = Number(novelStats?.ratings_count ?? 0);
+  const viewCount = Number(novelStats?.view_count ?? 0);
+  const uniqueViewers = Number(novelStats?.unique_viewers ?? 0);
 
   const loadChapter = useCallback(
     async (chapterNumber, withLoadingState = true) => {
@@ -186,8 +212,12 @@ export default function NovelDetailPage() {
       return;
     }
 
+    if (hasRecentViewTrack(readNovelId, currentUserId)) {
+      return;
+    }
+
     try {
-      await fetch(buildApiUrl(API_ENDPOINTS.trackNovelView(readNovelId)), {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.trackNovelView(readNovelId)), {
         method: "POST",
         headers: buildRequestHeaders(
           { Accept: "application/json", "Content-Type": "application/json" },
@@ -195,10 +225,16 @@ export default function NovelDetailPage() {
         ),
         body: JSON.stringify({}),
       });
+
+      if (!response.ok) {
+        return;
+      }
+
+      markViewTracked(readNovelId, currentUserId);
     } catch {
       // View tracking should never block reading.
     }
-  }, [readNovelId]);
+  }, [currentUserId, readNovelId]);
 
   const refreshReviews = useCallback(
     async ({ routeTitle = "", fallbackReviews = [] } = {}) => {
@@ -621,6 +657,10 @@ export default function NovelDetailPage() {
                 <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
                   <span className="rating-stars">{buildStars(averageRating)}</span>
                   <span>{averageRating.toFixed(1)} / 5 ({ratingsCount})</span>
+                </p>
+                <p>
+                  <strong>Unique Views:</strong> {uniqueViewers}
+                  <span> | Total Opens: {viewCount}</span>
                 </p>
                 <p>{getNovelDescription(novel)}</p>
                 {statsError && <p className="status-error">{statsError}</p>}
