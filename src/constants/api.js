@@ -1,0 +1,62 @@
+export const API_BASE_URL = "https://lifegiver13.pythonanywhere.com";
+
+export const API_ENDPOINTS = {
+  home: "/",
+  novels: "/api/novels",
+  search: (query) => `/api/search?query=${encodeURIComponent(query)}`,
+  myBooklist: (userId) =>
+    `/api/my_booklist?user_id=${encodeURIComponent(userId)}`,
+  login: "/api/login",
+  register: "/register",
+  users: "/api/users",
+  userDetails: (userId) => `/api/users/${encodeURIComponent(userId)}`,
+  saveNovel: (novelId) => `/save_novel/${encodeURIComponent(novelId)}`,
+  unsaveNovel: (novelId) => `/unsave_novel/${encodeURIComponent(novelId)}`,
+  chapter: (novelId, chapterNumber) =>
+    `/chapter/${encodeURIComponent(novelId)}/${encodeURIComponent(
+      chapterNumber,
+    )}`,
+  // Currently non-functional in backend (returns 404), kept as placeholders.
+  novelStats: (novelId) => `/api/novels/${encodeURIComponent(novelId)}/stats`,
+  trackNovelView: (novelId) =>
+    `/api/novels/${encodeURIComponent(novelId)}/view`,
+  // Placeholder endpoints for future ratings and reviews support.
+  rateNovel: (novelId) => `/api/novels/${encodeURIComponent(novelId)}/rating`,
+  novelReviews: (novelId) =>
+    `/api/novels/${encodeURIComponent(novelId)}/reviews`,
+  comments: "/comments",
+  novelDetails: (novelId, novelTitle) =>
+    `/novel/${encodeURIComponent(novelId)}/${encodeURIComponent(novelTitle)}`,
+  image: (imageName) => `/static/images/${imageName}`,
+};
+
+export const buildApiUrl = (endpoint) => `${API_BASE_URL}${endpoint}`;
+
+export const buildImageUrl = (imageName) =>
+  imageName ? buildApiUrl(API_ENDPOINTS.image(imageName)) : "";
+
+export const getNovelId = (novel) => novel?.novel_id ?? novel?.id ?? null;
+
+export const getNovelTitle = (novel) =>
+  novel?.novel_title ?? novel?.title ?? "Untitled";
+
+export const getNovelDescription = (novel) =>
+  novel?.description ?? novel?.summary ?? "";
+
+export const getNovelAuthor = (novel) => novel?.author ?? "Unknown author";
+
+export const getNovelSlug = (novelTitle = "") =>
+  String(novelTitle).trim().toLowerCase().replace(/\s+/g, "-");
+
+export const getNovelCover = (novel) => {
+  const coverImage = novel?.cover_image ?? novel?.image ?? "";
+  if (!coverImage) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(coverImage)) {
+    return coverImage;
+  }
+
+  return buildImageUrl(coverImage);
+};

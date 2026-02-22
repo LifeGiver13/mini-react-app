@@ -1,72 +1,120 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import Footer from './Footer';
-import './HeadOoter.css';
+import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import Footer from "./Footer";
+import "./HeadOoter.css";
 import "./Listings.css";
-import './SagaNews.css';
+import "./SagaNews.css";
 
+const MAIN_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
+  { to: "/sagaNews", label: "Saga News" },
+  { to: "/search", label: "Search" },
+  { to: "/trend", label: "Trending" },
+  { to: "/bookList", label: "Book List" },
+];
 
 export default function Header({ children }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    useEffect(() => {
-        const user = localStorage.getItem("user");
-        setIsLoggedIn(!!user);
-    }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("loggedIn");
-        localStorage.setItem('isLoggedIn', 'false');
-        localStorage.removeItem("userId");
-        localStorage.removeItem("username");
-        setIsLoggedIn(false);
-        navigate("/login");
-        window.location.reload();  // Reload to reset state
+  useEffect(() => {
+    const syncAuthState = () => {
+      const loggedInFlag = localStorage.getItem("loggedIn") === "true";
+      const user = localStorage.getItem("user");
+      setIsLoggedIn(loggedInFlag || Boolean(user));
     };
-    return (
-        <>
-            <div id="wrapper">
-                <div id="navbar">
-                    <Link to='/'>
-                        <img className="logo" src="/log.svg" alt="Scroll Saga" style={{ width: '190px' }} height="auto" />
-                    </Link>
-                    <input type="checkbox" id="menu-toggle" />
-                    <label htmlFor="menu-toggle" className="hamburger">&#9776;</label>
 
-                    <div className="nav-container">
-                        <ul className="nav-links">
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to='/about'>About</Link></li>
-                            <li><Link to='/sagaNews'>Saga News</Link></li>
-                            <li><Link to="/search">Search</Link></li>
+    syncAuthState();
+    window.addEventListener("storage", syncAuthState);
+    return () => {
+      window.removeEventListener("storage", syncAuthState);
+    };
+  }, []);
 
-                            {/* <li><Link to="/users">Users</Link></li> */}
-                            <li><Link to="/trend">Trending</Link></li>
-                            <li><Link to="/bookList">Book List</Link></li>
+  useEffect(() => {
+    setIsMenuOpen(false);
+    const loggedInFlag = localStorage.getItem("loggedIn") === "true";
+    const user = localStorage.getItem("user");
+    setIsLoggedIn(loggedInFlag || Boolean(user));
+  }, [location.pathname]);
 
-                            {!isLoggedIn ? (
-                                <>
-                                    <li><Link to="/register" className='btn'>Register</Link></li>
-                                    <li><Link to="/login" className='btn'>Login</Link></li>
-                                </>
-                            ) : (
-                                <li><button type='button' onClick={handleLogout} className="logout-btn">Logout</button></li>
-                            )}
-                        </ul>
-                    </div>
-                </div>
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
 
-                <div id='content'  >
+  return (
+    <div id="wrapper">
+      <header id="navbar">
+        <Link to="/" className="brand-link">
+          <img className="logo" src="/log.svg" alt="Scroll Saga" />
+        </Link>
 
-                    {children}
-                </div>
+        <button
+          type="button"
+          className="hamburger"
+          aria-expanded={isMenuOpen}
+          aria-controls="main-navigation"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+        >
+          {isMenuOpen ? "×" : "☰"}
+        </button>
 
-                <div id="footer">
-                    <Footer />
-                </div>
-            </div>
-        </>
-    );
+        <div id="main-navigation" className={`nav-container ${isMenuOpen ? "open" : ""}`}>
+          <ul className="nav-links">
+            {MAIN_LINKS.map((link) => (
+              <li key={link.to}>
+                <NavLink
+                  to={link.to}
+                  className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+                >
+                  {link.label}
+                </NavLink>
+              </li>
+            ))}
+
+            {!isLoggedIn ? (
+              <>
+                <li>
+                  <NavLink
+                    to="/register"
+                    className={({ isActive }) => `nav-link btn${isActive ? " active" : ""}`}
+                  >
+                    Register
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) => `nav-link btn${isActive ? " active" : ""}`}
+                  >
+                    Login
+                  </NavLink>
+                </li>
+              </>
+            ) : (
+              <li>
+                <button type="button" onClick={handleLogout} className="logout-btn">
+                  Logout
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      </header>
+
+      <main id="content">{children}</main>
+
+      <footer id="footer">
+        <Footer />
+      </footer>
+    </div>
+  );
 }
