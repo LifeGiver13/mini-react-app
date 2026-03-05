@@ -13,6 +13,7 @@ import "./SagaNews.css";
 
 const MAIN_LINKS = [
   { to: "/", label: "Home" },
+  { to: "/journey", label: "Journey" },
   { to: "/about", label: "About" },
   { to: "/sagaNews", label: "Saga News" },
   { to: "/search", label: "Search" },
@@ -181,7 +182,7 @@ export default function Header({ children }) {
           <ul className="nav-links">
             {isLoggedIn && (
               <li className="mobile-profile-row">
-                <Link to="/trend" className="mobile-profile-link">
+                <Link to="/profile" className="mobile-profile-link">
                   <img
                     src={profilePhoto}
                     alt={`${profileName || "User"} profile`}
@@ -234,7 +235,7 @@ export default function Header({ children }) {
         </div>
 
         {isLoggedIn && (
-          <Link to="/trend" className="desktop-profile-link">
+          <Link to="/profile" className="desktop-profile-link">
             <img
               src={profilePhoto}
               alt={`${profileName || "User"} profile`}

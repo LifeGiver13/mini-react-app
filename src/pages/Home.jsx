@@ -5,6 +5,7 @@ import {
   API_ENDPOINTS,
   buildApiUrl,
   getNovelAuthor,
+  getNovelCover,
   getNovelDescription,
   getNovelId,
   getNovelSlug,
@@ -14,6 +15,7 @@ import {
 
 const QUOTES_LIMIT = 3;
 const ACCORDION_LIMIT = 6;
+const SLIDESHOW_INTERVAL_MS = 6500;
 
 export default function Home() {
   const [sayings, setSayings] = useState([]);
@@ -22,6 +24,7 @@ export default function Home() {
   const [novels, setNovels] = useState([]);
   const [novelsLoading, setNovelsLoading] = useState(true);
   const [novelsError, setNovelsError] = useState("");
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   useEffect(() => {
     const fetchQuotes = async () => {
@@ -76,11 +79,97 @@ export default function Home() {
     fetchNovels();
   }, []);
 
+  useEffect(() => {
+    if (novels.length < 2) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveSlideIndex((prev) => (prev + 1) % novels.length);
+    }, SLIDESHOW_INTERVAL_MS);
+
+    return () => window.clearInterval(timer);
+  }, [novels]);
+
+  const goToNextSlide = () => {
+    if (novels.length === 0) {
+      return;
+    }
+    setActiveSlideIndex((prev) => (prev + 1) % novels.length);
+  };
+
+  const goToPreviousSlide = () => {
+    if (novels.length === 0) {
+      return;
+    }
+    setActiveSlideIndex((prev) => (prev - 1 + novels.length) % novels.length);
+  };
+
+  const activeSlide = novels[activeSlideIndex] ?? null;
+
   return (
     <Header>
       <h1>Home</h1>
       <div className="container themed-panel bg-man">
         <div className="content-stack">
+          <section className="home-slideshow">
+            <h2>Featured Stories</h2>
+            {novelsLoading ? (
+              <p>Loading featured novels...</p>
+            ) : novelsError ? (
+              <p className="status-error">{novelsError}</p>
+            ) : !activeSlide ? (
+              <p>No featured novels available right now.</p>
+            ) : (
+              <div className="slideshow-shell">
+                <button
+                  type="button"
+                  className="slideshow-nav"
+                  onClick={goToPreviousSlide}
+                  aria-label="Previous featured novel"
+                >
+                  Prev
+                </button>
+                <div className="slideshow-slide">
+                  <img
+                    src={getNovelCover(activeSlide)}
+                    alt={getNovelTitle(activeSlide)}
+                    className="slideshow-image"
+                    loading="lazy"
+                  />
+                  <div className="slideshow-content">
+                    <h3>{getNovelTitle(activeSlide)}</h3>
+                    <p>
+                      <strong>Author:</strong> {getNovelAuthor(activeSlide)}
+                    </p>
+                    <p className="slideshow-desc">{getNovelDescription(activeSlide)}</p>
+                    <div className="card-actions">
+                      <Link
+                        to={`/novel/${getNovelId(activeSlide)}/${encodeURIComponent(
+                          getNovelSlug(getNovelTitle(activeSlide)),
+                        )}`}
+                        className="logout-btn compact-btn"
+                      >
+                        Read Now
+                      </Link>
+                      <Link to="/journey" className="logout-btn compact-btn">
+                        User Journey
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="slideshow-nav"
+                  onClick={goToNextSlide}
+                  aria-label="Next featured novel"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </section>
+
           <section className="home-novel-accordion">
             <h2>Novel Quick Browse</h2>
             {novelsLoading ? (
@@ -99,8 +188,16 @@ export default function Home() {
                   return (
                     <details key={novelId ?? novelTitle} className="novel-accordion-item">
                       <summary>
-                        <span>{novelTitle}</span>
-                        <span>{getNovelAuthor(novel)}</span>
+                        <span className="novel-accordion-summary">
+                          <img
+                            src={getNovelCover(novel)}
+                            alt=""
+                            className="novel-accordion-thumb"
+                            loading="lazy"
+                          />
+                          <span className="novel-accordion-title">{novelTitle}</span>
+                        </span>
+                        <span className="novel-accordion-author">{getNovelAuthor(novel)}</span>
                       </summary>
                       <div className="novel-accordion-body">
                         <p>{getNovelDescription(novel)}</p>
@@ -164,8 +261,18 @@ export default function Home() {
             <div className="quote-snippet-list">
               {sayings.map((saying, index) => (
                 <article key={`${saying.animeName}-${index}`} className="quote-snippet">
-                  <p className="quote-text">&quot;{saying.quote}&quot;</p>
-                  <p className="quote-source">{saying.animeName}</p>
+                  {saying.image ? (
+                    <img
+                      src={saying.image}
+                      alt={saying.animeName || "Quote"}
+                      loading="lazy"
+                      className="quote-snippet-image"
+                    />
+                  ) : null}
+                  <div className="quote-snippet-body">
+                    <p className="quote-text">&quot;{saying.quote}&quot;</p>
+                    <p className="quote-source">{saying.animeName}</p>
+                  </div>
                 </article>
               ))}
             </div>

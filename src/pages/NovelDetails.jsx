@@ -121,6 +121,8 @@ export default function NovelDetailPage() {
 
   const readNovelId = Number(novelId);
   const currentUserId = getCurrentUserId();
+  const isLoggedIn = localStorage.getItem("loggedIn") === "true";
+  const canInteract = Boolean(isLoggedIn && currentUserId);
 
   const hasUserRated =
     novelStats?.current_user_rating !== null &&
@@ -318,8 +320,8 @@ export default function NovelDetailPage() {
       return;
     }
 
-    if (!currentUserId) {
-      setCommentError("Missing user id. Please log in again.");
+    if (!canInteract) {
+      setCommentError("Please log in to add a comment.");
       return;
     }
 
@@ -427,8 +429,8 @@ export default function NovelDetailPage() {
     setRatingError("");
     setRatingSuccess("");
 
-    if (!currentUserId) {
-      setRatingError("Missing user id. Please log in again.");
+    if (!canInteract) {
+      setRatingError("Please log in to rate this novel.");
       return;
     }
 
@@ -826,21 +828,21 @@ export default function NovelDetailPage() {
                         onChange={(event) => setCommentText(event.target.value)}
                         placeholder="Write your comment..."
                         rows={4}
-                        disabled={commentLoading || !currentUserId}
+                        disabled={commentLoading || !canInteract}
                       />
                       <div className="comment-form-actions">
                         <button
                           type="submit"
                           className="logout-btn compact-btn"
-                          disabled={commentLoading || !currentUserId}
+                          disabled={commentLoading || !canInteract}
                         >
-                          {!currentUserId
+                          {!canInteract
                             ? "Login Required"
                             : commentLoading
                               ? "Posting..."
                               : "Post Comment"}
                         </button>
-                        {!currentUserId && (
+                        {!canInteract && (
                           <p className="status-error">Log in to post a comment.</p>
                         )}
                         {commentError && <p className="status-error">{commentError}</p>}
