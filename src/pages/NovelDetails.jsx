@@ -16,6 +16,7 @@ import {
   getUserFriendlyErrorMessage,
   normalizeAverageRating,
 } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 const splitChapterContent = (rawContent) => {
   const content = String(rawContent ?? "");
@@ -158,6 +159,7 @@ export default function NovelDetailPage() {
         }
 
         setCurrentChapter(chapterData);
+        markJourneyEvent(JOURNEY_EVENTS.READ_CHAPTER);
       } catch (loadError) {
         setChapterError(
           getUserFriendlyErrorMessage(
@@ -410,6 +412,7 @@ export default function NovelDetailPage() {
 
       setCommentText("");
       setCommentSuccess(postPayload?.message || "Comment posted.");
+      markJourneyEvent(JOURNEY_EVENTS.POST_COMMENT);
       await refreshReviews({ routeTitle: activeRouteTitle, fallbackReviews: reviews });
     } catch (submitError) {
       setCommentError(
@@ -469,6 +472,7 @@ export default function NovelDetailPage() {
       }));
       setRatingValue(String(payload?.user_rating ?? numericRating));
       setRatingSuccess(payload?.message || "Rating submitted.");
+      markJourneyEvent(JOURNEY_EVENTS.RATE_NOVEL);
       void loadNovelStats();
     } catch (submitError) {
       setRatingError(
@@ -581,10 +585,12 @@ export default function NovelDetailPage() {
         setChapters(chapterList);
         setReviews(defaultReviews);
         setActiveRouteTitle(matchedRouteTitle);
+        markJourneyEvent(JOURNEY_EVENTS.OPEN_NOVEL);
 
         const firstChapter = detailsData.first_chapter ?? chapterList[0] ?? null;
         if (firstChapter?.chapter_id !== undefined || firstChapter?.content) {
           setCurrentChapter(firstChapter);
+          markJourneyEvent(JOURNEY_EVENTS.READ_CHAPTER);
         } else if (firstChapter?.chapter_number !== undefined) {
           await loadChapter(firstChapter.chapter_number, false);
         }

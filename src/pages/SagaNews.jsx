@@ -7,6 +7,7 @@ import {
   getNovelTitle,
   getUserFriendlyErrorMessage,
 } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 export default function SagaNews() {
   const [novels, setListings] = useState([]);
@@ -14,6 +15,8 @@ export default function SagaNews() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    markJourneyEvent(JOURNEY_EVENTS.VISIT_SAGA_NEWS);
+
     const fetchListings = async () => {
       try {
         const res = await fetch(buildApiUrl(API_ENDPOINTS.novels), {

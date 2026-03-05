@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
+import JourneyBanner from "./components/JourneyBanner";
 import {
   API_ENDPOINTS,
   buildApiUrl,
@@ -247,7 +248,10 @@ export default function Header({ children }) {
         )}
       </header>
 
-      <main id="content">{children}</main>
+      <main id="content">
+        <JourneyBanner />
+        {children}
+      </main>
 
       <footer id="footer">
         <Footer />

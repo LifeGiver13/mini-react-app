@@ -7,6 +7,68 @@
   padding: 0;
 }
 
+@media (max-width: 699px) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  /* Compact novel cards for narrow screens (keeps 2-column layout usable). */
+  .list #myDIV.novel-card,
+  .list .saying-item.novel-card {
+    padding: 0.6rem;
+    border-radius: 16px;
+  }
+
+  .list #myDIV.novel-card .flex-cont {
+    gap: 0.45rem;
+  }
+
+  .list .novel-card .novel-title {
+    font-size: 1rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .list .saying-item.novel-card .novel-title {
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .list .novel-card .novel-author,
+  .list .novel-card .novel-description,
+  .list .novel-card .rating-count,
+  .list .novel-card .rating-uniqueviews,
+  .list .novel-card .rating-totalviews {
+    display: none;
+  }
+
+  .list .novel-card .rating-summary {
+    margin: 0.25rem 0 0;
+    gap: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .list .novel-card .card-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin-top: 0.55rem;
+  }
+
+  .list .novel-card .card-actions .logout-btn {
+    width: 100%;
+    padding: 0.45rem 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 @media (min-width: 700px) {
   .list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
