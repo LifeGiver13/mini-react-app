@@ -15,6 +15,7 @@ import {
   getUserFriendlyErrorMessage,
   normalizeAverageRating,
 } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 const parseResponseJson = async (response) => {
   try {
@@ -74,6 +75,8 @@ export default function Listings() {
       setLoading(false);
       return;
     }
+
+    markJourneyEvent(JOURNEY_EVENTS.VISIT_TRENDING);
 
     const fetchListings = async () => {
       try {
@@ -215,6 +218,10 @@ export default function Listings() {
         return next;
       });
 
+      if (!isCurrentlySaved) {
+        markJourneyEvent(JOURNEY_EVENTS.SAVE_NOVEL);
+      }
+
       setSaveSuccess(
         payload?.message || (isCurrentlySaved ? "Removed from book list." : "Saved to book list."),
       );
@@ -263,19 +270,20 @@ export default function Listings() {
               const uniqueViews = Number(stats?.unique_viewers ?? 0);
 
               return (
-                <li key={novelId ?? novelTitle} id="myDIV">
+                <li key={novelId ?? novelTitle} id="myDIV" className="novel-card">
                   <div className="flex-cont">
                     <img src={getNovelCover(novel)} alt={novelTitle} loading="lazy" />
                     <div>
-                      <h3>{novelTitle}</h3>
-                      <h4>Author: {getNovelAuthor(novel)}</h4>
+                      <h3 className="novel-title">{novelTitle}</h3>
+                      <h4 className="novel-author">Author: {getNovelAuthor(novel)}</h4>
                       <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
                         <span className="rating-stars">{buildStars(averageRating)}</span>
-                        <span>{averageRating.toFixed(1)} / 5 ({ratingCount})</span>
-                        <span>Unique Views: {uniqueViews}</span>
-                        <span>Total Opens: {viewCount}</span>
+                        <span className="rating-numbers">{averageRating.toFixed(1)} / 5</span>
+                        <span className="rating-count">({ratingCount})</span>
+                        <span className="rating-uniqueviews">Unique Views: {uniqueViews}</span>
+                        <span className="rating-totalviews">Total Opens: {viewCount}</span>
                       </p>
-                      <p>{getNovelDescription(novel)}</p>
+                      <p className="novel-description">{getNovelDescription(novel)}</p>
                       <div className="card-actions">
                         <button
                           type="button"
@@ -286,7 +294,7 @@ export default function Listings() {
                           {isSaving ? "Working..." : isSaved ? "Unsave" : "Save"}
                         </button>
                         <button
-                          className="logout-btn"
+                          className="logout-btn compact-btn"
                           onClick={() => handleDetailsRedirect(novelId, novelTitle)}
                         >
                           Read Now!

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Header";
 import { getUserFriendlyErrorMessage } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 export default function Quotes() {
   const [quotes, setQuotes] = useState([]);
@@ -9,6 +10,8 @@ export default function Quotes() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    markJourneyEvent(JOURNEY_EVENTS.VISIT_QUOTES);
+
     const fetchQuotes = async () => {
       try {
         const response = await fetch(

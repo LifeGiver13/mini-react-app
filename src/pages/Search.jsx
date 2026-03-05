@@ -16,6 +16,7 @@ import {
   getUserFriendlyErrorMessage,
   normalizeAverageRating,
 } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 const parseResponseJson = async (response) => {
   try {
@@ -225,6 +226,10 @@ export default function Search() {
         return next;
       });
 
+      if (!isCurrentlySaved) {
+        markJourneyEvent(JOURNEY_EVENTS.SAVE_NOVEL);
+      }
+
       setSaveSuccess(
         payload?.message || (isCurrentlySaved ? "Removed from book list." : "Saved to book list."),
       );
@@ -278,17 +283,18 @@ export default function Search() {
               const uniqueViews = Number(stats?.unique_viewers ?? 0);
 
               return (
-                <li key={novelId ?? novelTitle} className="saying-item">
+                <li key={novelId ?? novelTitle} className="saying-item novel-card">
                   <img src={getNovelCover(novel)} alt={novelTitle} loading="lazy" />
-                  <h3>{novelTitle}</h3>
-                  <p>by {getNovelAuthor(novel)}</p>
+                  <h3 className="novel-title">{novelTitle}</h3>
+                  <p className="novel-author">by {getNovelAuthor(novel)}</p>
                   <p className="rating-summary" aria-label={`Average rating ${averageRating} out of 5`}>
                     <span className="rating-stars">{buildStars(averageRating)}</span>
-                    <span>{averageRating.toFixed(1)} / 5 ({ratingCount})</span>
-                    <span>Unique Views: {uniqueViews}</span>
-                    <span>Total Opens: {viewCount}</span>
+                    <span className="rating-numbers">{averageRating.toFixed(1)} / 5</span>
+                    <span className="rating-count">({ratingCount})</span>
+                    <span className="rating-uniqueviews">Unique Views: {uniqueViews}</span>
+                    <span className="rating-totalviews">Total Opens: {viewCount}</span>
                   </p>
-                  <span>{getNovelDescription(novel)}</span>
+                  <span className="novel-description">{getNovelDescription(novel)}</span>
                   <div className="card-actions">
                     <button
                       type="button"

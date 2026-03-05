@@ -9,6 +9,7 @@ import {
   getProfilePhotoUrl,
   getUserFriendlyErrorMessage,
 } from "../constants/api";
+import { JOURNEY_EVENTS, markJourneyEvent } from "../constants/journey";
 
 const parseResponseJson = async (response) => {
   try {
@@ -163,6 +164,7 @@ export default function Profile() {
 
       window.dispatchEvent(new Event("profileUpdated"));
       setProfileSuccess(payload?.message || "Profile updated successfully.");
+      markJourneyEvent(JOURNEY_EVENTS.UPDATE_PROFILE);
     } catch (updateError) {
       setProfileError(
         getUserFriendlyErrorMessage(
@@ -211,6 +213,7 @@ export default function Profile() {
       setPhotoFile(null);
       await loadProfile();
       window.dispatchEvent(new Event("profileUpdated"));
+      markJourneyEvent(JOURNEY_EVENTS.UPLOAD_PROFILE_PHOTO);
     } catch (uploadError) {
       setPhotoError(
         getUserFriendlyErrorMessage(
@@ -325,4 +328,3 @@ export default function Profile() {
     </Header>
   );
 }
-
