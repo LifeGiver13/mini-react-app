@@ -276,6 +276,36 @@ p {
   list-style: none;
 }
 
+.novel-accordion-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.novel-accordion-thumb {
+  width: 44px;
+  height: 58px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(139, 90, 43, 0.55);
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.novel-accordion-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.novel-accordion-author {
+  color: rgba(31, 35, 40, 0.8);
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
 .novel-accordion-item summary::-webkit-details-marker {
   display: none;
 }
@@ -309,16 +339,90 @@ p {
 }
 
 .quote-snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
   padding: 0.65rem 0.8rem;
   border-radius: 10px;
   border: 1px solid rgba(52, 58, 64, 0.2);
   background: #f7ecd6;
 }
 
+.quote-snippet-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid rgba(139, 90, 43, 0.55);
+  flex-shrink: 0;
+}
+
+.quote-snippet-body {
+  min-width: 0;
+}
+
 .quote-source {
   margin: 0;
   color: rgba(31, 35, 40, 0.8);
   font-weight: 700;
+}
+
+.home-slideshow {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(139, 90, 43, 0.26);
+  border-radius: 14px;
+  background: rgba(247, 233, 202, 0.72);
+}
+
+.home-slideshow h2 {
+  margin-top: 0;
+}
+
+.slideshow-shell {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.slideshow-nav {
+  width: 72px;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(52, 58, 64, 0.35);
+  background: linear-gradient(to bottom, #f5deb3, #f7ecd6, #f5deb3);
+  color: #343a40;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.slideshow-slide {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.7rem;
+  border-radius: 14px;
+  border: 1px solid rgba(52, 58, 64, 0.2);
+  background: #f7ecd6;
+}
+
+.slideshow-image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 90, 43, 0.55);
+}
+
+.slideshow-content h3 {
+  margin: 0 0 0.35rem;
+  color: #343a40;
+}
+
+.slideshow-desc {
+  margin: 0.25rem 0 0.65rem;
+  color: rgba(31, 35, 40, 0.88);
 }
 
 .quote-archive-grid {
@@ -341,6 +445,30 @@ p {
   border-radius: 10px;
   border: 1px solid rgba(139, 90, 43, 0.45);
   margin-bottom: 0.5rem;
+}
+
+.journey-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+.journey-card-inner {
+  width: 100%;
+  text-align: left;
+}
+
+.journey-title {
+  margin: 0;
+}
+
+.journey-desc {
+  margin: 0.5rem 0 0.85rem;
+}
+
+.journey-done {
+  align-self: center;
 }
 
 .action-row {
@@ -638,5 +766,27 @@ button {
   .novel-accordion-item summary {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .novel-accordion-author {
+    padding-left: 3.1rem;
+  }
+
+  .slideshow-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .slideshow-nav {
+    width: 100%;
+  }
+
+  .slideshow-slide {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 820px) {
+  .journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

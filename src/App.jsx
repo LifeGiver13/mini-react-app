@@ -11,6 +11,8 @@ import BookList from './pages/BookList';
 import Search from './pages/Search';
 import NovelDetailPage from './pages/NovelDetails';
 import Quotes from './pages/Quotes';
+import Profile from './pages/Profile';
+import Journey from './pages/Journey';
 import Header from './Header';
 import "./App.css";
 
@@ -30,6 +32,8 @@ export default function App() {
         <Route path="/bookList" element={<BookList />} />
         <Route path="/search" element={<Search />} />
         <Route path="/quotes" element={<Quotes />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/journey" element={<Journey />} />
         <Route path="/novel/:novelId" element={<NovelDetailPage />} />
         <Route path="/novel/:novelId/:novelTitle" element={<NovelDetailPage />} />
         <Route
